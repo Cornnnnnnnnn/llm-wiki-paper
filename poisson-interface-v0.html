@@ -1,0 +1,438 @@
+<!DOCTYPE html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5f2eb"><title>從零看懂 Poisson Interface Problem — 界面研究室</title><link rel="stylesheet" href="assets/v0/slides.css"><script defer="" src="assets/v0/slides.js"></script><link rel="stylesheet" href="assets/v0/beginner.css"><link rel="icon" href="assets/v0/favicon.svg" type="image/svg+xml"></head>
+<body>
+<header class="deck-topbar"><a href="index.html" class="deck-brand">界面研究室 <span>／</span> 小講義 01</a><div class="deck-tools"><button id="notes-toggle" aria-pressed="false">講義補充</button><button id="overview-toggle" aria-pressed="false">總覽</button><button id="print-deck">列印</button></div></header>
+<div class="deck-layout">
+<aside class="deck-sidebar"><div class="sidebar-heading">CONTENTS<span>もくじ</span></div><nav aria-label="講義章節"><a href="#slide-1" data-goto="0"><span>01</span>介面之間</a><a href="#slide-2" data-goto="1"><span>02</span>先看兩種材料</a><a href="#slide-3" data-goto="2"><span>03</span>Poisson 在找什麼</a><a href="#slide-4" data-goto="3"><span>04</span>邊界與介面</a><a href="#slide-5" data-goto="4"><span>05</span>一個折線例子</a><a href="#slide-6" data-goto="5"><span>06</span>什麼是 jump？</a><a href="#slide-7" data-goto="6"><span>07</span>完整問題</a><a href="#slide-8" data-goto="7"><span>08</span>有限差分</a><a href="#slide-9" data-goto="8"><span>09</span>IIM 怎麼修正？</a><a href="#slide-10" data-goto="9"><span>10</span>怎麼看誤差？</a><a href="#slide-11" data-goto="10"><span>11</span>延伸：多解一個 jump</a><a href="#slide-12" data-goto="11"><span>12</span>延伸：neural 方法</a></nav><div class="sidebar-bottom"><span class="seal">界<br>面</span><p>讀原文，<br>也讀方法之間的關係。</p><a href="index.html">回到 Wiki ↗</a></div></aside>
+<main class="deck-main" aria-label="Poisson interface problem 講義">
+<div class="deck-status"><span>RESEARCH HANDOUT <i>／</i> POISSON INTERFACE PROBLEM</span><span id="top-counter">01 — 12</span></div>
+<div id="slides"><section class="slide cover active" id="slide-1" data-title="介面之間">
+<div class="slide-topline"><span>計算數學のノート</span><span>LECTURE NOTE / 01</span></div>
+<div class="cover-grid"><div><div class="cover-label"><span></span> ELLIPTIC INTERFACE PROBLEMS</div><h1>介面之間，<br>如何解 <em>Poisson</em>？</h1><p class="cover-subtitle">從零看懂問題、介面與跳躍<br>再認識 Immersed Interface Method</p><div class="cover-description">不用先讀過這個主題的論文。<br>從圖像和符號開始，一步一步讀。</div><div class="cover-tag">READ THE EQUATIONS. FOLLOW THE INTERFACE.</div></div>
+<div class="cover-figure"><svg viewBox="0 0 360 360" role="img" aria-label="介面將矩形計算域分成內外兩側的示意圖">
+<defs><pattern id="cover-grid" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M24 0H0V24" fill="none" stroke="#d4d0c6" stroke-width=".7"></path></pattern><pattern id="cover-hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(40)"><path d="M0 0V7" stroke="#c8c3b8" stroke-width="1"></path></pattern><marker id="cover-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#a14f40"></path></marker></defs>
+<rect x="30" y="30" width="288" height="288" fill="url(#cover-grid)" stroke="#9a978c"></rect><path d="M118 108C160 66 242 103 253 169C269 228 227 270 165 254C101 248 75 177 118 108Z" fill="url(#cover-hatch)" stroke="#353c36" stroke-width="2"></path><path d="M252 167L293 158" stroke="#a14f40" stroke-width="1.5" marker-end="url(#cover-arrow)"></path><circle cx="252" cy="167" r="3.5" fill="#a14f40"></circle><text x="161" y="179">Ω⁻</text><text x="69" y="76">Ω⁺</text><text x="223" y="270" fill="#a14f40">Γ</text><text x="276" y="145" font-size="17" fill="#a14f40">n</text><text x="24" y="344" font-size="12" letter-spacing="2">ONE DOMAIN, TWO TRACES.</text>
+</svg><span class="figure-caption">[AI] 幾何示意，非原文數值網格。</span></div></div>
+<div class="cover-bottom"><span>BASED ON THE LOCAL PAPER WIKI</span><span class="cover-note">一頁一個重點，慢慢讀懂。<span>→</span></span></div>
+<footer class="slide-footer"><span>依據：LeVeque &amp; Li (1994)，§§1、3–4 <a href="paper/iim1994.pdf#page=18" target="_blank" rel="noopener">PDF p.18 ↗</a></span><span>01</span></footer>
+<div class="handout-note"><strong>講義補充</strong><p>本講義從 1994 IIM 的 elliptic formulation 開始；後面連結 HLY15、DCSNN 與 cusp PINN。Gibou2005 與 HLM18 列為延伸閱讀。圖示只用來辨識區域和方向，不表示本次重新計算了任何解。</p></div>
+</section>
+<section class="slide" data-title="先看兩種材料" id="slide-2"><div class="slide-topline"><span>01 / A FIRST PICTURE</span><span>まず、身近な図から。</span></div><h2>先想像一個區域，<br>裡面有兩種不同材料。</h2><p class="slide-lead">LeVeque–Li 以不同導熱係數的材料，說明這類問題的背景。</p>
+<div class="beginner-picture"><svg viewBox="0 0 650 220" role="img" aria-label="兩種材料與內部接合處示意"><defs><pattern id="material-hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 0V8" stroke="#c6c9b9" stroke-width="1"></path></pattern></defs><rect x="35" y="30" width="580" height="135" fill="none" stroke="#8b9583"></rect><path d="M35 30H320V165H35Z" fill="url(#material-hatch)"></path><path d="M320 30V165" stroke="#a35543" stroke-width="2"></path><text x="120" y="80">材料 A</text><text x="120" y="115" font-size="17">導熱係數 β⁻</text><text x="430" y="80">材料 B</text><text x="430" y="115" font-size="17">導熱係數 β⁺</text><path d="M320 170V190" stroke="#a35543"></path><text x="238" y="212" fill="#a35543" font-size="15">接合的位置：介面 Γ</text></svg><span class="figure-caption">[AI] 教學示意：用兩種材料辨認介面，不是論文的數值實驗。</span></div>
+<div class="beginner-three"><div><span>想知道什麼？</span><h3>區域內的分布 u</h3><p>例如穩態的溫度。</p></div><div><span>已經知道什麼？</span><h3>材料與外部條件</h3><p>例如各側的導熱係數。</p></div><div><span>多了什麼難處？</span><h3>材料在介面改變</h3><p>解的變化方式也可能不同。</p></div></div>
+<div class="margin-note"><span>[AI] 直覺讀法</span><p>這裡先把 u 想成一張待求的「溫度地圖」。我們先看穩態，不討論隨時間演化。</p></div><footer class="slide-footer"><span>背景：<a href="paper/iim1994.pdf#page=1" target="_blank" rel="noopener">LeVeque &amp; Li (1994)，§1，PDF p.1 ↗</a></span><span>02</span></footer><div class="handout-note"><strong>講義補充</strong><p>不同材料的穩態熱傳與 electrostatic problems 都是原文 §1 的例子。此頁只借用導熱的直覺建立圖像；後面方程採原文正號形式，f 的物理正負號必須依所選模型約定。</p></div></section>
+<section class="slide" data-title="Poisson 在找什麼" id="slide-3"><div class="slide-topline"><span>02 / MEET THE EQUATION</span><span>記号を、ひとつずつ。</span></div><h2>Poisson 方程，<br>是在找一個未知的函數。</h2><p class="slide-lead">先看最簡單的二維、常係數形式。</p>
+<div class="beginner-main-equation"><div class="math-display" data-tex="\Delta u=u_{xx}+u_{yy}=f"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi mathvariant="normal">Δ</mi>
+  <mi>u</mi>
+  <mo>=</mo>
+  <msub>
+    <mi>u</mi>
+    <mrow data-mjx-texclass="ORD">
+      <mi>x</mi>
+      <mi>x</mi>
+    </mrow>
+  </msub>
+  <mo>+</mo>
+  <msub>
+    <mi>u</mi>
+    <mrow data-mjx-texclass="ORD">
+      <mi>y</mi>
+      <mi>y</mi>
+    </mrow>
+  </msub>
+  <mo>=</mo>
+  <mi>f</mi>
+</math></div></div>
+<div class="beginner-three symbol-cards"><div><span>UNKNOWN</span><h3>u(x, y)</h3><p>要解出的分布。<br>每個位置，都有一個值。</p></div><div><span>GIVEN</span><h3>f(x, y)</h3><p>已知的右端項。<br>源項的正負依方程約定。</p></div><div><span>OPERATOR</span><h3>Δ（Laplacian）</h3><p>本頁是 x、y 方向<br>二階導數的總和。</p></div></div>
+<div class="margin-note"><span>[AI] 讀公式的方法</span><p>先分清「未知的 u」和「已知的 f」。Δu = f 是要求 u 滿足的關係；還要加邊界或介面條件，才是這裡要解的完整問題。</p></div><footer class="slide-footer"><span>取 β = 1、κ = 0 的特例：<a href="paper/iim1994.pdf#page=18" target="_blank" rel="noopener">LeVeque–Li (4.1)，PDF p.18 ↗</a></span><span>03</span></footer><div class="handout-note"><strong>講義補充</strong><p>二階導數描述函數變化的變化；本頁只先辨認符號。材料係數不再相同時，會使用 ∇·(β∇u) 的形式。後面的「完整問題」頁會把 β、外邊界和介面條件一起寫出來。</p></div></section>
+<section class="slide" data-title="邊界與介面" id="slide-4"><div class="slide-topline"><span>03 / BOUNDARY VS INTERFACE</span><span>外側と、内側。</span></div><h2>外邊界與內部介面，<br>是兩個不同的位置。</h2><p class="slide-lead">外圈告訴我們邊緣的條件；內部介面告訴我們兩側的關係。</p>
+<div class="boundary-layout"><svg viewBox="0 0 420 280" role="img" aria-label="外邊界與內部介面對照"><defs><pattern id="boundary-dot" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".7" fill="#b4bca8"></circle></pattern><marker id="boundary-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#a35543"></path></marker></defs><rect x="55" y="25" width="300" height="210" stroke="#485944" fill="none" stroke-width="2"></rect><ellipse cx="205" cy="128" rx="78" ry="65" fill="url(#boundary-dot)" stroke="#a35543" stroke-width="2"></ellipse><text x="182" y="133">Ω⁻</text><text x="83" y="70">Ω⁺</text><text x="271" y="195" fill="#a35543">Γ</text><path d="M282 130H323" stroke="#a35543" marker-end="url(#boundary-arrow)"></path><text x="302" y="118" fill="#a35543" font-size="16">n</text><text x="130" y="266" font-size="16">外框：外邊界 ∂Ω</text></svg><div class="boundary-labels"><div><span>外邊界 ∂Ω</span><p>例如給定邊緣的值 u = g。</p></div><div><span>介面 Γ</span><p>位於區域內，分開 Ω⁻ 與 Ω⁺。</p></div><div><span>法向 n</span><p>在這裡由 − 側指向 + 側，<br>用來指定穿過介面的方向。</p></div></div></div><p class="quiet-caption">[AI] 圖像讀法：Ω 表示區域；−／+ 只是兩側的名字，不代表溫度的正負。幾何慣例依原文。</p><footer class="slide-footer"><span><a href="paper/iim1994.pdf#page=13" target="_blank" rel="noopener">LeVeque–Li §3，PDF p.13 ↗</a> · 外邊界例：<a href="paper/iim1994.pdf#page=21" target="_blank" rel="noopener">§5，PDF p.21 ↗</a></span><span>04</span></footer><div class="handout-note"><strong>講義補充</strong><p>外邊界與內部介面不能互相替代。這裡以 Dirichlet outer boundary 為例；原文數值例子用 exact solution 指定外邊界值。Γ 兩側用 +、− 命名，這不是在表示函數一定為正或負。</p></div></section>
+<section class="slide" data-title="一個折線例子" id="slide-5"><div class="slide-topline"><span>04 / ONE-DIMENSIONAL EXAMPLE</span><span>値は同じ。傾きは違う。</span></div><h2>值接得上，<br>斜率卻可以不一樣。</h2><p class="slide-lead">先用一維例子，看見「解連續，但導數跳躍」。</p>
+<div class="example-layout"><div><svg viewBox="0 0 460 235" role="img" aria-label="兩段直線在 x 等於三分之一處連續接合，但左右斜率不同"><path d="M40 25V205M27 50H430" stroke="#a3ab96" fill="none"></path><path d="M166.67 50V195" stroke="#b4bba8" stroke-dasharray="4 4"></path><path d="M40 50L166.67 185" stroke="#354f3b" stroke-width="3"></path><path d="M166.67 185L420 50" stroke="#a35543" stroke-width="3"></path><circle cx="166.67" cy="185" r="4" fill="#354f3b" stroke="#354f3b" stroke-width="1.5"></circle><text x="28" y="224" font-size="15">0</text><text x="147" y="224" font-size="15">a = ⅓</text><text x="414" y="224" font-size="15">1</text><text x="15" y="26" font-size="17">u</text><text x="435" y="55" font-size="16">x</text><text x="51" y="132" font-size="15">左斜率 −⅔</text><text x="273" y="151" font-size="15" fill="#a35543">右斜率 ⅓</text></svg><p class="figure-caption">[AI] 教學重繪；曲線依原文 (28) 的解析式，不是新數值實驗。</p></div><div><span class="small-index">EXACT SOLUTION / a = 1/3</span><div class="math-display" data-tex="u(x)=\begin{cases}(a-1)x,&amp;x<a,\\a(x-1),&amp;x\ge a.\end{cases}"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>u</mi>
+  <mo stretchy="false">(</mo>
+  <mi>x</mi>
+  <mo stretchy="false">)</mo>
+  <mo>=</mo>
+  <mrow data-mjx-texclass="INNER">
+    <mo data-mjx-texclass="OPEN">{</mo>
+    <mtable columnspacing="1em" rowspacing=".2em" columnalign="left left">
+      <mtr>
+        <mtd>
+          <mo stretchy="false">(</mo>
+          <mi>a</mi>
+          <mo>−</mo>
+          <mn>1</mn>
+          <mo stretchy="false">)</mo>
+          <mi>x</mi>
+          <mo>,</mo>
+        </mtd>
+        <mtd>
+          <mi>x</mi>
+          <mo>&lt;</mo>
+          <mi>a</mi>
+          <mo>,</mo>
+        </mtd>
+      </mtr>
+      <mtr>
+        <mtd>
+          <mi>a</mi>
+          <mo stretchy="false">(</mo>
+          <mi>x</mi>
+          <mo>−</mo>
+          <mn>1</mn>
+          <mo stretchy="false">)</mo>
+          <mo>,</mo>
+        </mtd>
+        <mtd>
+          <mi>x</mi>
+          <mo>≥</mo>
+          <mi>a</mi>
+          <mo>.</mo>
+        </mtd>
+      </mtr>
+    </mtable>
+    <mo data-mjx-texclass="CLOSE" fence="true" stretchy="true" symmetric="true"></mo>
+  </mrow>
+</math></div><p class="example-description">兩段在同一個高度相接。<br>但左右兩段，傾斜程度不同。</p></div></div>
+<div class="beginner-three compact"><div><span>兩側的方程</span><div class="math-display" data-tex="u''=0"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msup>
+    <mi>u</mi>
+    <mo data-mjx-alternate="1">″</mo>
+  </msup>
+  <mo>=</mo>
+  <mn>0</mn>
+</math></div></div><div><span>端點條件</span><div class="math-display" data-tex="u(0)=u(1)=0"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>u</mi>
+  <mo stretchy="false">(</mo>
+  <mn>0</mn>
+  <mo stretchy="false">)</mo>
+  <mo>=</mo>
+  <mi>u</mi>
+  <mo stretchy="false">(</mo>
+  <mn>1</mn>
+  <mo stretchy="false">)</mo>
+  <mo>=</mo>
+  <mn>0</mn>
+</math></div></div><div><span>介面處</span><div class="math-display" data-tex="[u]=0,\quad[u']=1"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">[</mo>
+  <mi>u</mi>
+  <mo stretchy="false">]</mo>
+  <mo>=</mo>
+  <mn>0</mn>
+  <mo>,</mo>
+  <mspace width="1em"></mspace>
+  <mo stretchy="false">[</mo>
+  <msup>
+    <mi>u</mi>
+    <mo data-mjx-alternate="1">′</mo>
+  </msup>
+  <mo stretchy="false">]</mo>
+  <mo>=</mo>
+  <mn>1</mn>
+</math></div></div></div><footer class="slide-footer"><span>例子與解析式：<a href="paper/2210.08424v2.pdf#page=10" target="_blank" rel="noopener">Tseng et al.，Example 1，(25)–(28)，PDF p.10 ↗</a></span><span>05</span></footer><div class="handout-note"><strong>講義補充</strong><p>每側 u″ = 0，所以原文的 exact solution 各側為直線。此例沒有解值跳躍，只有一階導數的 jump。左、右斜率數值是將 a = 1/3 代入原文公式後的讀圖標記；下一頁再正式定義中括號 [·]。</p></div></section>
+<section class="slide" id="slide-6" data-title="什麼是 jump？">
+<div class="slide-topline"><span>05 / JUMP CONDITIONS</span><span>違いを、分けて読む。</span></div><h2>Jump，就是<br>同一位置的「兩側差」。</h2><div class="jump-definition"><span>在介面取極限：+ 側，減去 − 側。</span><div class="math-display" data-tex="[q]=q^+-q^-"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">[</mo>
+  <mi>q</mi>
+  <mo stretchy="false">]</mo>
+  <mo>=</mo>
+  <msup>
+    <mi>q</mi>
+    <mo>+</mo>
+  </msup>
+  <mo>−</mo>
+  <msup>
+    <mi>q</mi>
+    <mo>−</mo>
+  </msup>
+</math></div><p>法向 n 由 Ω⁻ 指向 Ω⁺。</p></div>
+<p class="beginner-gloss">[AI] 符號讀法：u<sub>n</sub> 是「沿 n 方向的斜率」；βu<sub>n</sub> 再乘上材料係數 β，就是這裡要指定的加權法向通量。</p><div class="jump-cards"><div class="jump-card"><span class="small-index">A / VALUE</span><div class="math-display" data-tex="[u]=w"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">[</mo>
+  <mi>u</mi>
+  <mo stretchy="false">]</mo>
+  <mo>=</mo>
+  <mi>w</mi>
+</math></div><h3>兩側的值，可以不同。</h3><p>w 指定解本身的跳躍。<br>w = 0 時，解在介面連續。</p></div><div class="jump-card"><span class="small-index">B / WEIGHTED NORMAL FLUX</span><div class="math-display" data-tex="[\beta u_n]=v"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">[</mo>
+  <mi>β</mi>
+  <msub>
+    <mi>u</mi>
+    <mi>n</mi>
+  </msub>
+  <mo stretchy="false">]</mo>
+  <mo>=</mo>
+  <mi>v</mi>
+</math></div><h3>通量和導數，要分開看。</h3><p>β 不連續時，通量連續<br>不能直接推出法向導數連續。</p></div></div>
+<div class="margin-note"><span>[AI] 接著讀圖</span><p>上一頁的兩段直線，解的高度相同，所以 [u] = 0；右斜率減左斜率，得到 [u′] = 1。這裡的 jump 是空間兩側的差，不是時間上的變化。</p></div>
+<footer class="slide-footer"><span>LeVeque–Li (4.2)–(4.3)，<a href="paper/iim1994.pdf#page=18" target="_blank" rel="noopener">p.18 ↗</a> · HLY15 (7)，<a href="paper/HLY15.pdf#page=3" target="_blank" rel="noopener">p.3 ↗</a></span><span>06</span></footer>
+<div class="handout-note"><strong>講義補充</strong><p>LeVeque–Li 的一維示範以跨介面積分得到 [βuₓ] = C，見 (2.4)，PDF p.6。這裡的 jump 是同一介面點的兩側極限之差；normal derivative 的方向必須保持一致。</p></div>
+</section>
+<section class="slide" id="slide-7" data-title="完整問題">
+<div class="slide-topline"><span>06 / PROBLEM SETUP</span><span>まず、問題を見る。</span></div><h2>把剛剛的圖，<br>寫成一個完整問題。</h2><p class="slide-lead">兩側的方程、介面上的關係，以及外邊界條件，都需要給定。</p>
+<div class="setup-grid"><div class="equation-stack"><div class="formula-box"><span class="formula-label">BULK EQUATION</span><div class="math-display" data-tex="\nabla\cdot(\beta\nabla u)=f,\qquad \mathbf{x}\in\Omega^-\cup\Omega^+"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi mathvariant="normal">∇</mi>
+  <mo>⋅</mo>
+  <mo stretchy="false">(</mo>
+  <mi>β</mi>
+  <mi mathvariant="normal">∇</mi>
+  <mi>u</mi>
+  <mo stretchy="false">)</mo>
+  <mo>=</mo>
+  <mi>f</mi>
+  <mo>,</mo>
+  <mspace width="2em"></mspace>
+  <mrow data-mjx-texclass="ORD">
+    <mi mathvariant="bold">x</mi>
+  </mrow>
+  <mo>∈</mo>
+  <msup>
+    <mi mathvariant="normal">Ω</mi>
+    <mo>−</mo>
+  </msup>
+  <mo>∪</mo>
+  <msup>
+    <mi mathvariant="normal">Ω</mi>
+    <mo>+</mo>
+  </msup>
+</math></div></div><div class="formula-pair"><div><span class="formula-label">SOLUTION JUMP</span><div class="math-display" data-tex="[u]=w"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">[</mo>
+  <mi>u</mi>
+  <mo stretchy="false">]</mo>
+  <mo>=</mo>
+  <mi>w</mi>
+</math></div></div><div><span class="formula-label">FLUX JUMP</span><div class="math-display" data-tex="[\beta u_n]=v"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">[</mo>
+  <mi>β</mi>
+  <msub>
+    <mi>u</mi>
+    <mi>n</mi>
+  </msub>
+  <mo stretchy="false">]</mo>
+  <mo>=</mo>
+  <mi>v</mi>
+</math></div></div></div><p class="quiet-caption">取 LeVeque–Li (4.1) 的 κ = 0 特例；w、v 沿介面給定。</p></div><div class="definition-list"><div><span>Ω⁻ / Ω⁺</span><p>介面兩側的子區域</p></div><div><span>Γ</span><p>嵌在計算域裡的介面</p></div><div><span>β</span><p>可跨介面跳躍的係數</p></div><div><span>∂Ω</span><p>仍需給定外邊界條件</p></div></div></div>
+<div class="margin-note"><span>記號約定</span><p>本頁沿用 LeVeque–Li：<strong>w 是解跳躍，v 是通量跳躍。</strong>其他論文可能使用不同字母。</p></div>
+<footer class="slide-footer"><span>LeVeque &amp; Li (1994)，(4.1)–(4.3) <a href="paper/iim1994.pdf#page=18" target="_blank" rel="noopener">PDF p.18 ↗</a></span><span>07</span></footer>
+<div class="handout-note"><strong>講義補充</strong><p>原文的一般形式還有 reaction term κu。本講義聚焦 Poisson-type interface problem，取 κ = 0，不把兩側各自滿足的方程視為介面上可直接微分的光滑方程。資料與正則性假設見 Wiki 的 IIM 基礎筆記。</p></div>
+</section>
+<section class="slide" data-title="有限差分" id="slide-8"><div class="slide-topline"><span>07 / FINITE DIFFERENCES</span><span>近くの値から、近似する。</span></div><h2>電腦先記住的，<br>是網格上有限個 u 值。</h2><p class="slide-lead">Finite difference（有限差分）用鄰近的值，近似方程裡的導數。</p>
+<div class="grid-values"><span>uᵢ₋₁</span><i></i><span>uᵢ</span><i></i><span>uᵢ₊₁</span></div><div class="grid-spacing">相鄰網格點的距離 = h</div>
+<div class="beginner-main-equation"><div class="math-display" data-tex="u''(x_i)\approx\frac{u_{i-1}-2u_i+u_{i+1}}{h^2}"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msup>
+    <mi>u</mi>
+    <mo data-mjx-alternate="1">″</mo>
+  </msup>
+  <mo stretchy="false">(</mo>
+  <msub>
+    <mi>x</mi>
+    <mi>i</mi>
+  </msub>
+  <mo stretchy="false">)</mo>
+  <mo>≈</mo>
+  <mfrac>
+    <mrow>
+      <msub>
+        <mi>u</mi>
+        <mrow data-mjx-texclass="ORD">
+          <mi>i</mi>
+          <mo>−</mo>
+          <mn>1</mn>
+        </mrow>
+      </msub>
+      <mo>−</mo>
+      <mn>2</mn>
+      <msub>
+        <mi>u</mi>
+        <mi>i</mi>
+      </msub>
+      <mo>+</mo>
+      <msub>
+        <mi>u</mi>
+        <mrow data-mjx-texclass="ORD">
+          <mi>i</mi>
+          <mo>+</mo>
+          <mn>1</mn>
+        </mrow>
+      </msub>
+    </mrow>
+    <msup>
+      <mi>h</mi>
+      <mn>2</mn>
+    </msup>
+  </mfrac>
+</math></div></div>
+<div class="beginner-three"><div><span>GRID POINT</span><h3>xᵢ</h3><p>第 i 個取樣位置。</p></div><div><span>DISCRETE UNKNOWN</span><h3>uᵢ</h3><p>在該位置要求的近似值。</p></div><div><span>STENCIL</span><h3>用到的鄰點</h3><p>本頁用左、中、右三點。</p></div></div>
+<div class="margin-note"><span>[AI] 接下來的難點</span><p>上面的標準公式假設附近足夠光滑。如果介面剛好穿過這幾點之間，就要把兩側的跳躍也算進去。</p></div><footer class="slide-footer"><span>取常係數特例：<a href="paper/iim1994.pdf#page=6" target="_blank" rel="noopener">LeVeque–Li (2.7)，PDF p.6 ↗</a></span><span>08</span></footer><div class="handout-note"><strong>講義補充</strong><p>此頁只先介紹三點二階導數近似。完整 IIM 不只是把每側各自套同一公式；近介面處需要修正。二維常見的五點 stencil 是中心點及四個軸向鄰點，下一頁以概念圖說明。</p></div></section>
+<section class="slide" id="slide-9" data-title="IIM 怎麼修正？">
+<div class="slide-topline"><span>08 / IMMERSED INTERFACE METHOD</span><span>界面の近くを、直す。</span></div><h2>介面穿過網格時，<br>IIM 修正附近的差分式。</h2><p class="slide-lead">沒有跨介面的點叫 regular；跨介面的點叫 irregular，需要用 jump relations 修正。</p>
+<div class="iim-grid"><div class="stencil-figure"><svg viewBox="0 0 320 220" role="img" aria-label="介面穿越差分 stencil 的概念圖"><defs><pattern id="stencil-grid" width="45" height="45" patternUnits="userSpaceOnUse"><path d="M45 0H0V45" stroke="#d2cec3" stroke-width="1" fill="none"></path></pattern></defs><rect x="25" y="15" width="270" height="180" fill="url(#stencil-grid)"></rect><path d="M150 14Q115 90 175 195" stroke="#a14f40" stroke-width="2" fill="none"></path><path d="M115 60V150M70 105H160" stroke="#454c45" stroke-width="1.2"></path><path d="M115 105L160 60" stroke="#454c45" stroke-dasharray="4 4"></path><g fill="#353c36"><circle cx="115" cy="105" r="5"></circle><circle cx="115" cy="60" r="4"></circle><circle cx="115" cy="150" r="4"></circle><circle cx="70" cy="105" r="4"></circle><circle cx="160" cy="105" r="4"></circle></g><circle cx="160" cy="60" r="5" fill="#f5f2eb" stroke="#a14f40" stroke-width="1.5"></circle><text x="182" y="48" fill="#a14f40" font-size="13">第六點</text><text x="194" y="175" fill="#a14f40" font-size="18">Γ</text></svg><span class="figure-caption">[AI] 依原文方法重畫的概念示意，非實際 stencil 計算。</span></div><div class="method-steps"><div><span>01</span><p>選附近的介面點，<br>在各側近似解的變化（Taylor 展開）。</p></div><div><span>02</span><p>以 jump relations 與 PDE，<br>把兩側的導數關係接起來。</p></div><div><span>03</span><p>決定 stencil 係數，<br>以及右端 correction。</p></div></div></div>
+<div class="formula-strip"><div class="math-display" data-tex="\sum_k\gamma_k u_{i+i_k,j+j_k}=f_{ij}+C_{ij}"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <munder>
+    <mo>∑</mo>
+    <mi>k</mi>
+  </munder>
+  <msub>
+    <mi>γ</mi>
+    <mi>k</mi>
+  </msub>
+  <msub>
+    <mi>u</mi>
+    <mrow data-mjx-texclass="ORD">
+      <mi>i</mi>
+      <mo>+</mo>
+      <msub>
+        <mi>i</mi>
+        <mi>k</mi>
+      </msub>
+      <mo>,</mo>
+      <mi>j</mi>
+      <mo>+</mo>
+      <msub>
+        <mi>j</mi>
+        <mi>k</mi>
+      </msub>
+    </mrow>
+  </msub>
+  <mo>=</mo>
+  <msub>
+    <mi>f</mi>
+    <mrow data-mjx-texclass="ORD">
+      <mi>i</mi>
+      <mi>j</mi>
+    </mrow>
+  </msub>
+  <mo>+</mo>
+  <msub>
+    <mi>C</mi>
+    <mrow data-mjx-texclass="ORD">
+      <mi>i</mi>
+      <mi>j</mi>
+    </mrow>
+  </msub>
+</math></div><p>一般二維情況，至多六個 stencil points。<br>常係數 Poisson 特例可保留五點 Laplacian，只改右端。</p></div>
+<footer class="slide-footer"><span>LeVeque &amp; Li (1994)，(3.2)、§§3–4、§6 <a href="paper/iim1994.pdf#page=12" target="_blank" rel="noopener">PDF pp.12–21、25 ↗</a></span><span>09</span></footer>
+<div class="handout-note"><strong>講義補充</strong><p>一般六點係數系統與「只修正右端」的常係數特例要分開。推導還用到介面曲率、切向微分與兩側 PDE，不能只提供 [u] 和一個 normal jump 就略過高階導數關係。公式採本講義 κ = 0 的設定。</p></div>
+</section>
+<section class="slide" id="slide-10" data-title="怎麼看誤差？">
+<div class="slide-topline"><span>09 / ACCURACY</span><span>同じ「誤差」ではない。</span></div><h2>局部是一階，<br>全域解仍可能是二階。</h2><p class="slide-lead">局部截斷誤差，是把真解代回差分式的殘差；全域解誤差，是近似解和真解的差。</p>
+<div class="order-pair"><div><span class="small-index">AT IRREGULAR POINTS</span><div class="math-display" data-tex="T_{ij}=O(h)"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msub>
+    <mi>T</mi>
+    <mrow data-mjx-texclass="ORD">
+      <mi>i</mi>
+      <mi>j</mi>
+    </mrow>
+  </msub>
+  <mo>=</mo>
+  <mi>O</mi>
+  <mo stretchy="false">(</mo>
+  <mi>h</mi>
+  <mo stretchy="false">)</mo>
+</math></div><p>介面附近的局部截斷誤差</p></div><span class="order-separator">≠</span><div><span class="small-index">GLOBAL GRID SOLUTION</span><div class="math-display" data-tex="\|E_n\|_\infty=O(h^2)"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo data-mjx-texclass="ORD" fence="false" stretchy="false">‖</mo>
+  <msub>
+    <mi>E</mi>
+    <mi>n</mi>
+  </msub>
+  <msub>
+    <mo data-mjx-texclass="ORD" fence="false" stretchy="false">‖</mo>
+    <mi mathvariant="normal">∞</mi>
+  </msub>
+  <mo>=</mo>
+  <mi>O</mi>
+  <mo stretchy="false">(</mo>
+  <msup>
+    <mi>h</mi>
+    <mn>2</mn>
+  </msup>
+  <mo stretchy="false">)</mo>
+</math></div><p>所有網格點的最大解誤差</p></div></div>
+<div class="accuracy-bottom"><div class="table-heading"><span>一個具體例子</span><h3>LeVeque–Li，Example 1</h3><p>圓介面、常係數與 singular source。<br>以下是 Table 1 的 IIM 結果，沒有重新計算實驗。</p></div><table><thead><tr><th>GRID n</th><th>MAX SOLUTION ERROR</th><th>REFINEMENT RATIO</th></tr></thead><tbody><tr><td>80</td><td>2.4451 × 10⁻⁴</td><td>3.4134</td></tr><tr><td>160</td><td>6.6856 × 10⁻⁵</td><td>3.6573</td></tr><tr><td>320</td><td>1.5672 × 10⁻⁵</td><td>4.2658</td></tr></tbody></table></div>
+<p class="quiet-caption accuracy-caption">[AI] 表格讀法：n 加倍、h 減半時，誤差約剩 1/4，對應二階。原文 ratio 逐漸接近 4；這不是任意離散的一般證明。</p>
+<footer class="slide-footer"><span>LeVeque &amp; Li (1994)，§5、Table 1 <a href="paper/iim1994.pdf#page=22" target="_blank" rel="noopener">PDF p.22 ↗</a></span><span>10</span></footer>
+<div class="handout-note"><strong>講義補充</strong><p>Regular points 的局部截斷誤差為 O(h²)。原文展示介面附近允許較低的局部階數，同時得到二階網格解。Gibou2005 也討論局部截斷階數與解階數不必相同；參見 Wiki「誤差與驗證」。</p></div>
+</section>
+<section class="slide" id="slide-11" data-title="延伸：多解一個 jump">
+<div class="slide-topline"><span>10 / AUGMENTED IIM</span><span>足りない jump を、未知数に。</span></div><h2>延伸：有些條件已知，<br>還有一個 jump 要一起解。</h2><p class="slide-lead">Augmented IIM：在網格上的解以外，再增加待求的介面未知量。</p>
+<div class="augmented-flow"><div><span class="small-index">GIVEN</span><div class="math-display" data-tex="[\sigma\phi_n]=w"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">[</mo>
+  <mi>σ</mi>
+  <msub>
+    <mi>ϕ</mi>
+    <mi>n</mi>
+  </msub>
+  <mo stretchy="false">]</mo>
+  <mo>=</mo>
+  <mi>w</mi>
+</math></div><p>物理條件給定 weighted flux</p></div><span class="flow-arrow">→</span><div><span class="small-index">AUGMENTED UNKNOWN</span><div class="math-display" data-tex="g=[\phi_n]"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>g</mi>
+  <mo>=</mo>
+  <mo stretchy="false">[</mo>
+  <msub>
+    <mi>ϕ</mi>
+    <mi>n</mi>
+  </msub>
+  <mo stretchy="false">]</mo>
+</math></div><p>Correction 需要的 normal jump</p></div></div>
+<div class="beginner-pipeline"><div><span>01</span><h3>給定物理條件</h3><p>例如已知 weighted flux jump。</p></div><b>→</b><div><span>02</span><h3>一起求缺少的 jump</h3><p>由介面條件與網格解互相配合。</p></div><b>→</b><div><span>03</span><h3>得到網格上的電勢</h3><p>供後續計算電場與電力使用。</p></div></div><div class="margin-note"><span>SOLVER</span><p>消去網格未知量 → 在介面上以 GMRES 解 Schur system → 回代電勢。<br>每次需要網格解時，使用 fast Poisson solver。</p></div>
+<footer class="slide-footer"><span>HLY15，§3.1、(18)–(19)，D 依原文的物性比分支定義 <a href="paper/HLY15.pdf#page=6" target="_blank" rel="noopener">PDF p.6 ↗</a></span><span>11</span></footer>
+<div class="handout-note"><strong>講義補充</strong><p>此處 w 沿用 HLY15 的記號，表示通量跳躍，和 LeVeque–Li 的 w 意義不同。HLY15 在分段常係數下將方程轉為 Poisson problems，再加入介面未知量；它不是直接沿用 1994 的一般六點係數系統。</p></div>
+</section>
+<section class="slide" id="slide-12" data-title="延伸：neural 方法">
+<div class="slide-topline"><span>11 / NEURAL REPRESENTATIONS</span><span>離散を直す。表現を変える。</span></div><h2>延伸：另一條路，<br>是讓函數直接表示兩側的解。</h2><p class="slide-lead">這兩篇以帶參數的 neural network 表示解，訓練它符合 PDE、邊界和介面條件。</p><div class="neural-grid"><div class="neural-card"><span class="small-index">DCSNN / HU ET AL., 2022 v3</span><h3>用 label 分開兩側。</h3><div class="math-display" data-tex="u(\mathbf{x})=U(\mathbf{x},z),\quad z=\pm1"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>u</mi>
+  <mo stretchy="false">(</mo>
+  <mrow data-mjx-texclass="ORD">
+    <mi mathvariant="bold">x</mi>
+  </mrow>
+  <mo stretchy="false">)</mo>
+  <mo>=</mo>
+  <mi>U</mi>
+  <mo stretchy="false">(</mo>
+  <mrow data-mjx-texclass="ORD">
+    <mi mathvariant="bold">x</mi>
+  </mrow>
+  <mo>,</mo>
+  <mi>z</mi>
+  <mo stretchy="false">)</mo>
+  <mo>,</mo>
+  <mspace width="1em"></mspace>
+  <mi>z</mi>
+  <mo>=</mo>
+  <mo>±</mo>
+  <mn>1</mn>
+</math></div><p>兩個 slices 可有不同的解值。<br>以 loss（誤差指標）約束解值與通量跳躍。</p><div class="neural-foot">z = −1、+1 標記所屬區域；此處將原文 φ、φaug 統一記為 u、U。</div></div><div class="neural-card"><span class="small-index">CUSP PINN / TSENG ET AL., 2023 v2</span><h3>用 cusp 留住導數跳躍。</h3><div class="math-display" data-tex="u(\mathbf{x})=U(\mathbf{x},|\phi(\mathbf{x})|)"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>u</mi>
+  <mo stretchy="false">(</mo>
+  <mrow data-mjx-texclass="ORD">
+    <mi mathvariant="bold">x</mi>
+  </mrow>
+  <mo stretchy="false">)</mo>
+  <mo>=</mo>
+  <mi>U</mi>
+  <mo stretchy="false">(</mo>
+  <mrow data-mjx-texclass="ORD">
+    <mi mathvariant="bold">x</mi>
+  </mrow>
+  <mo>,</mo>
+  <mo data-mjx-texclass="ORD" stretchy="false">|</mo>
+  <mi>ϕ</mi>
+  <mo stretchy="false">(</mo>
+  <mrow data-mjx-texclass="ORD">
+    <mi mathvariant="bold">x</mi>
+  </mrow>
+  <mo stretchy="false">)</mo>
+  <mo data-mjx-texclass="ORD" stretchy="false">|</mo>
+  <mo stretchy="false">)</mo>
+</math></div><p>解值自動連續，導數可以跳躍。<br>若解值也跳躍，另加 lifting network。</p><div class="neural-foot">φ 是標示介面的函數：介面上 φ = 0，兩側分別取正、負；它不是 DCSNN 的解函數。</div></div></div>
+<div class="margin-note"><span>比較之前</span><p>兩篇主要驗證 stationary elliptic problems；網路參數數量、網格未知量與訓練成本不能直接畫上等號。</p></div>
+<footer class="slide-footer"><span><a href="paper/2106.05587v3.pdf#page=4" target="_blank" rel="noopener">DCSNN §§2–3，PDF pp.4–9 ↗</a> · <a href="paper/2210.08424v2.pdf#page=5" target="_blank" rel="noopener">Cusp §§3.1–3.2，PDF pp.5–9 ↗</a></span><span>12</span></footer>
+<div class="handout-note"><strong>講義補充</strong><p>這是有文獻依據的表示法比較，不是提出新的 ansatz。DCSNN 的空間導數固定 label；cusp PINN 的物理解則需對 composite input 使用 chain rule，介面導數採單側極限。兩篇六維測試的 exact solutions 不同，不直接比較誤差大小排名。</p></div>
+</section></div>
+<div class="deck-navigation"><div><span class="nav-label">閱讀進度</span><span id="page-counter">01 / 12</span></div><div class="progress-track"><span id="progress-fill"></span></div><span class="keyboard-hint">← → 翻頁</span><button id="prev-slide" aria-label="上一頁">←</button><button id="next-slide" aria-label="下一頁">→</button></div>
+</main></div>
+
+
+
+</body></html>

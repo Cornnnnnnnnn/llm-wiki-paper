@@ -1,0 +1,793 @@
+<!DOCTYPE html><html lang="zh-Hant" class="no-js"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#f5f2eb"><meta name="description" content="從材料、方程與 jump conditions 出發，用圖解理解 Poisson interface problem 與 IIM；封面與十二張圖解簡報，根據 Wiki 與原始論文整理。"><title>Poisson interface problem — 界面研究室</title><link rel="icon" href="assets/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="assets/deck.css"><script defer="" src="assets/deck.js"></script></head><body><a class="skip" href="#slides">跳到簡報</a><header class="topbar"><a class="brand" href="index.html">界面研究室 / Poisson interface problem</a><div class="tools"><button id="overview-toggle" aria-pressed="false">整份閱讀</button><button id="focus-toggle" aria-pressed="false">投影模式</button><button id="print-deck">列印</button></div></header><div class="layout"><aside class="sidebar"><p class="sidebar-label">A NOTE ON INTERFACES</p><nav aria-label="投影片目錄"><a href="#slide-1" data-goto="0"><span>01</span>封面</a><a href="#slide-2" data-goto="1"><span>02</span>要解什麼？</a><a href="#slide-3" data-goto="2"><span>03</span>兩種材料</a><a href="#slide-4" data-goto="3"><span>04</span>方程符號</a><a href="#slide-5" data-goto="4"><span>05</span>邊界與介面</a><a href="#slide-6" data-goto="5"><span>06</span>連續的折線</a><a href="#slide-7" data-goto="6"><span>07</span>Jump 的意思</a><a href="#slide-8" data-goto="7"><span>08</span>導數與通量</a><a href="#slide-9" data-goto="8"><span>09</span>完整問題</a><a href="#slide-10" data-goto="9"><span>10</span>有限差分</a><a href="#slide-11" data-goto="10"><span>11</span>跨介面的困難</a><a href="#slide-12" data-goto="11"><span>12</span>IIM 修正</a><a href="#slide-13" data-goto="12"><span>13</span>精度與證據</a></nav><div class="sidebar-bottom">從問題出發，<br>一步一步看懂介面。<br><br><a href="index.html">回到 Wiki ↗</a></div></aside><main><noscript><p>未啟用 JavaScript：以下顯示完整十三張內容。</p></noscript><div id="slides"><section class="slide active cover-slide" id="slide-1" data-content-id="C00" aria-label="Poisson interface problem"><div class="eyebrow"><span>00 / POISSON INTERFACE PROBLEM</span><span>一步一步，看懂介面。</span></div><div class="content"><div class="cover-composition"><div class="cover-copy"><span class="cover-kicker">INTERFACE NOTES / 01</span><h1>Poisson<br>interface problem</h1><p class="cover-subtitle">從介面條件到 IIM</p><p class="cover-intro">從直覺、方程到數值方法，<br>一步一步看懂兩側如何接起來。</p><div class="cover-route"><span>認識問題</span><i>→</i><span>理解條件</span><i>→</i><span>看懂方法</span></div></div><figure class="figure"><svg viewBox="0 0 600 440" role="img" aria-label="方形規則網格穿過圓形介面，呈現兩側材料與介面交會的概念示意"><defs>
+    <pattern id="minus-cover" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 24L24 0" stroke="#65775f" stroke-opacity=".10" stroke-width="1"></path></pattern>
+    <pattern id="plus-cover" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.1" fill="#a35543" opacity=".16"></circle></pattern>
+    <marker id="arrow-cover" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#303a33" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></marker>
+    <marker id="minus-arrow-cover" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#65775f" stroke-width="1.6"></path></marker>
+    <marker id="plus-arrow-cover" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#a35543" stroke-width="1.6"></path></marker>
+    </defs><rect x="62" y="65" width="470" height="280" fill="#f0e7df" rx="3"></rect>
+    <rect x="62" y="65" width="470" height="280" fill="url(#plus-cover)"></rect>
+    <circle cx="280" cy="205" r="106" fill="#e0e7da"></circle>
+    <circle cx="280" cy="205" r="106" fill="url(#minus-cover)"></circle>
+    <rect x="62" y="65" width="470" height="280" class="domain-edge" rx="3"></rect>
+    <circle cx="280" cy="205" r="106" class="interface"></circle>
+    <path d="M90 135H506M90 205H506M90 275H506M140 92V321M210 92V321M280 92V321M350 92V321M420 92V321M490 92V321" class="cover-grid"></path>
+    <circle cx="350" cy="135" r="5" fill="var(--red)"></circle><circle cx="280" cy="205" r="5" fill="var(--green)"></circle>
+    <circle cx="210" cy="275" r="5" fill="var(--green)"></circle>
+    <path d="M386 205H471" class="normal" marker-end="url(#arrow-cover)"></path>
+    <text x="70" y="397" class="cover-art-label">同一個區域，兩側的故事。</text></svg><figcaption class="caption">介面與規則網格的概念示意 <span class="ai">[AI]</span></figcaption></figure></div></div><footer class="footer"><span>介面問題 · 圖解筆記</span><span class="page">01</span></footer></section><section class="slide  " id="slide-2" data-content-id="S01" aria-label="遇到介面，Poisson 要解什麼？"><div class="eyebrow"><span>01 / THE QUESTION</span><span>一步一步，看懂介面。</span></div><h2 id="title-2">遇到介面，Poisson 要解什麼？</h2><p class="lead">求出區域內的 u，並讓它符合兩側方程與接合條件。</p><div class="content">
+<div class="split wide-figure"><figure class="figure"><svg viewBox="0 0 600 365" role="img" aria-label="同一個方形區域、同一個圓介面，負側在內、正側在外"><defs>
+    <pattern id="minus-s1" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 24L24 0" stroke="#65775f" stroke-opacity=".10" stroke-width="1"></path></pattern>
+    <pattern id="plus-s1" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.1" fill="#a35543" opacity=".16"></circle></pattern>
+    <marker id="arrow-s1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#303a33" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></marker>
+    <marker id="minus-arrow-s1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#65775f" stroke-width="1.6"></path></marker>
+    <marker id="plus-arrow-s1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#a35543" stroke-width="1.6"></path></marker>
+    </defs><rect x="52" y="35" width="496" height="274" rx="3" fill="#f0e7df"></rect>
+    <rect x="52" y="35" width="496" height="274" rx="3" fill="url(#plus-s1)"></rect>
+    <circle cx="270" cy="172" r="101" fill="#e0e7da"></circle>
+    <circle cx="270" cy="172" r="101" fill="url(#minus-s1)"></circle>
+    <rect x="52" y="35" width="496" height="274" rx="3" class="domain-edge"></rect>
+    <circle cx="270" cy="172" r="101" class="interface"></circle><text x="270" y="181" text-anchor="middle" class="region-word">待求的 u</text>
+        <text x="455" y="181" text-anchor="middle" class="region-word">待求的 u</text>
+        <path d="M180 218L121 267L87 267" class="callout"></path>
+        <text x="80" y="298" class="diagram-small">介面</text></svg><div class="figure-legend"><span><i class="minus-key" aria-hidden="true"></i>區域內部</span><span><i class="plus-key" aria-hidden="true"></i>介面另一側</span></div><figcaption class="caption">問題配置示意 <span class="ai">[AI]</span></figcaption></figure><div class="stack"><p class="statement">u 是隨位置改變、<br>等待求出的量。</p><div class="numbered"><div><span class="step-number">01</span><p>區域內的方程</p></div><div><span class="step-number">02</span><p>外緣的條件</p></div><div><span class="step-number">03</span><p>兩側的接合條件</p></div></div><p>一道介面，把「兩側怎麼解」與「兩側怎麼接」放進同一個問題。</p></div></div><p class="note">從問題如何定義開始，再看介面附近怎麼計算。</p>
+</div><footer class="footer"><span>介面問題 · 圖解筆記</span><span class="page">02</span></footer></section><section class="slide  " id="slide-3" data-content-id="S02" aria-label="同一個區域，可以有兩種材料"><div class="eyebrow"><span>02 / TWO MATERIALS</span><span>一步一步，看懂介面。</span></div><h2 id="title-3">同一個區域，可以有兩種材料</h2><p class="lead">β 在介面兩側不同，解的變化方式也可能不同。</p><div class="content">
+<div class="split wide-figure"><figure class="figure"><p class="figure-overline">Ω · 整個區域</p><svg viewBox="0 0 600 365" role="img" aria-label="同一個方形區域、同一個圓介面，負側在內、正側在外"><defs>
+    <pattern id="minus-s2" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 24L24 0" stroke="#65775f" stroke-opacity=".10" stroke-width="1"></path></pattern>
+    <pattern id="plus-s2" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.1" fill="#a35543" opacity=".16"></circle></pattern>
+    <marker id="arrow-s2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#303a33" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></marker>
+    <marker id="minus-arrow-s2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#65775f" stroke-width="1.6"></path></marker>
+    <marker id="plus-arrow-s2" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#a35543" stroke-width="1.6"></path></marker>
+    </defs><rect x="52" y="35" width="496" height="274" rx="3" fill="#f0e7df"></rect>
+    <rect x="52" y="35" width="496" height="274" rx="3" fill="url(#plus-s2)"></rect>
+    <circle cx="270" cy="172" r="101" fill="#e0e7da"></circle>
+    <circle cx="270" cy="172" r="101" fill="url(#minus-s2)"></circle>
+    <rect x="52" y="35" width="496" height="274" rx="3" class="domain-edge"></rect>
+    <circle cx="270" cy="172" r="101" class="interface"></circle><text x="270" y="171" text-anchor="middle" class="region-symbol minus">Ω⁻</text>
+        <text x="455" y="171" text-anchor="middle" class="region-symbol plus">Ω⁺</text><text x="270" y="216" text-anchor="middle" class="coefficient minus">β⁻</text>
+            <text x="455" y="216" text-anchor="middle" class="coefficient plus">β⁺</text>
+            </svg><div class="figure-legend"><span><i class="minus-key" aria-hidden="true"></i>Ω⁻：材料一</span><span><i class="plus-key" aria-hidden="true"></i>Ω⁺：材料二</span></div><figcaption class="caption">固定幾何，加入材料係數；示意 <span class="ai">[AI]</span></figcaption></figure><div class="stack"><p class="statement">β：材料係數<br><span class="small">例如擴散係數</span></p><p>即使 u 接得上，兩種材料中的變化快慢也可能不同。</p><p class="note">本簡報取 β &gt; 0。<br>入門圖先把各側 β 視為常數。</p></div></div><p class="small">一般分段光滑係數仍使用散度形式；正負上標表示介面兩側。</p>
+</div><footer class="footer"><span>介面問題 · 圖解筆記</span><span class="page">03</span></footer></section><section class="slide  " id="slide-4" data-content-id="S03" aria-label="先看懂 Poisson 方程的符號"><div class="eyebrow"><span>03 / READ THE EQUATION</span><span>一步一步，看懂介面。</span></div><h2 id="title-4">先看懂 Poisson 方程的符號</h2><p class="lead">u 是未知分布，f 是已知右端項；先在介面以外的各側看方程。</p><div class="content">
+<div class="equation"><div class="math-display" data-tex="\nabla\cdot(\beta\nabla u)=f"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi mathvariant="normal">∇</mi>
+  <mo>⋅</mo>
+  <mo stretchy="false">(</mo>
+  <mi>β</mi>
+  <mi mathvariant="normal">∇</mi>
+  <mi>u</mi>
+  <mo stretchy="false">)</mo>
+  <mo>=</mo>
+  <mi>f</mi>
+</math></div></div>
+<div class="definitions"><div class="definition"><strong>u</strong><p>未知分布</p></div><div class="definition"><strong>β</strong><p>材料係數</p></div><div class="definition"><strong>f</strong><p>已知右端項</p></div><div class="definition"><strong>∇u</strong><p>各方向的變化率</p></div><div class="definition"><strong>∇·</strong><p>各方向的散度</p></div><div class="definition"><strong>Δu</strong><p>各方向二階導數的和</p></div></div>
+<div class="equation compact-equation"><div class="math-display" data-tex="\beta=1\ \Longrightarrow\ \Delta u=f"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>β</mi>
+  <mo>=</mo>
+  <mn>1</mn>
+  <mtext>&nbsp;</mtext>
+  <mo stretchy="false">⟹</mo>
+  <mtext>&nbsp;</mtext>
+  <mi mathvariant="normal">Δ</mi>
+  <mi>u</mi>
+  <mo>=</mo>
+  <mi>f</mi>
+</math></div><div class="math-display" data-tex="\Delta u=\frac{\partial^2u}{\partial x^2}+\frac{\partial^2u}{\partial y^2}\quad\text{（二維）}"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi mathvariant="normal">Δ</mi>
+  <mi>u</mi>
+  <mo>=</mo>
+  <mfrac>
+    <mrow>
+      <msup>
+        <mi>∂</mi>
+        <mn>2</mn>
+      </msup>
+      <mi>u</mi>
+    </mrow>
+    <mrow>
+      <mi>∂</mi>
+      <msup>
+        <mi>x</mi>
+        <mn>2</mn>
+      </msup>
+    </mrow>
+  </mfrac>
+  <mo>+</mo>
+  <mfrac>
+    <mrow>
+      <msup>
+        <mi>∂</mi>
+        <mn>2</mn>
+      </msup>
+      <mi>u</mi>
+    </mrow>
+    <mrow>
+      <mi>∂</mi>
+      <msup>
+        <mi>y</mi>
+        <mn>2</mn>
+      </msup>
+    </mrow>
+  </mfrac>
+  <mspace width="1em"></mspace>
+  <mtext>（二維）</mtext>
+</math></div></div>
+<p class="note">一階導數看變化率；二階導數看變化率如何再變化。<span class="ai">[AI]</span><br>本簡報不含反應項；不能把跨介面跳躍當作光滑導數。</p>
+</div><footer class="footer"><span>介面問題 · 圖解筆記</span><span class="page">04</span></footer></section><section class="slide  " id="slide-5" data-content-id="S04" aria-label="外邊界和內部介面不是同一件事"><div class="eyebrow"><span>04 / BOUNDARY &amp; INTERFACE</span><span>一步一步，看懂介面。</span></div><h2 id="title-5">外邊界和內部介面不是同一件事</h2><p class="lead">外邊界指定邊緣條件；介面指定兩側之間的關係。</p><div class="content">
+<div class="split wide-figure"><figure class="figure"><svg viewBox="0 0 600 365" role="img" aria-label="同一個方形區域、同一個圓介面，負側在內、正側在外"><defs>
+    <pattern id="minus-s4" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 24L24 0" stroke="#65775f" stroke-opacity=".10" stroke-width="1"></path></pattern>
+    <pattern id="plus-s4" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.1" fill="#a35543" opacity=".16"></circle></pattern>
+    <marker id="arrow-s4" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#303a33" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></marker>
+    <marker id="minus-arrow-s4" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#65775f" stroke-width="1.6"></path></marker>
+    <marker id="plus-arrow-s4" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#a35543" stroke-width="1.6"></path></marker>
+    </defs><rect x="52" y="35" width="496" height="274" rx="3" fill="#f0e7df"></rect>
+    <rect x="52" y="35" width="496" height="274" rx="3" fill="url(#plus-s4)"></rect>
+    <circle cx="270" cy="172" r="101" fill="#e0e7da"></circle>
+    <circle cx="270" cy="172" r="101" fill="url(#minus-s4)"></circle>
+    <rect x="52" y="35" width="496" height="274" rx="3" class="domain-edge"></rect>
+    <circle cx="270" cy="172" r="101" class="interface"></circle><text x="270" y="171" text-anchor="middle" class="region-symbol minus">Ω⁻</text>
+        <text x="455" y="171" text-anchor="middle" class="region-symbol plus">Ω⁺</text><path d="M341 101L395 47" class="normal" marker-end="url(#arrow-s4)"></path>
+            <text x="413" y="75" class="normal-label">n</text>
+            <path d="M198 243L153 329L121 329" class="callout"></path>
+            <text x="90" y="339" class="region-symbol">Γ</text>
+            <text x="508" y="342" class="region-symbol">∂Ω</text></svg><div class="figure-legend"><span><i class="minus-key" aria-hidden="true"></i>Ω⁻：介面內側</span><span><i class="plus-key" aria-hidden="true"></i>Ω⁺：介面外側</span></div><figcaption class="caption">共同法向 n：從 Ω⁻ 指向 Ω⁺；示意 <span class="ai">[AI]</span></figcaption></figure><div class="stack"><div class="condition"><p>∂Ω · 外邊界</p><div class="math-display" data-tex="u=g"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>u</mi>
+  <mo>=</mo>
+  <mi>g</mi>
+</math></div><p>g 是已知邊界值。<br>指定值條件稱 Dirichlet boundary condition。</p></div><div class="condition"><p>Γ · 內部介面</p><p class="statement">比較兩側的值與導數。</p></div><div class="math-display" data-tex="\partial_nu=\nabla u\cdot\mathbf n"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msub>
+    <mi>∂</mi>
+    <mi>n</mi>
+  </msub>
+  <mi>u</mi>
+  <mo>=</mo>
+  <mi mathvariant="normal">∇</mi>
+  <mi>u</mi>
+  <mo>⋅</mo>
+  <mrow data-mjx-texclass="ORD">
+    <mi mathvariant="bold">n</mi>
+  </mrow>
+</math></div><p class="small">沿同一個單位法向 n 的變化率。</p></div></div><p class="note">下一步：用 jump 表示兩側之間的關係。</p>
+</div><footer class="footer"><span>介面問題 · 圖解筆記</span><span class="page">05</span></footer></section><section class="slide  " id="slide-6" data-content-id="S05" aria-label="值接得上，斜率也可能不同"><div class="eyebrow"><span>05 / A CONTINUOUS KINK</span><span>一步一步，看懂介面。</span></div><h2 id="title-6">值接得上，斜率也可能不同</h2><p class="lead">先看一個兩邊都是直線的例子：介面在 a = 1/3。</p><div class="content">
+<div class="split wide-figure"><figure class="figure"><svg viewBox="0 0 600 365" role="img" aria-label="依原文解析式繪製的一維折線，兩側在三分之一處接合，最低值負九分之二"><defs>
+    <pattern id="minus-s5" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 24L24 0" stroke="#65775f" stroke-opacity=".10" stroke-width="1"></path></pattern>
+    <pattern id="plus-s5" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.1" fill="#a35543" opacity=".16"></circle></pattern>
+    <marker id="arrow-s5" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#303a33" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></marker>
+    <marker id="minus-arrow-s5" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#65775f" stroke-width="1.6"></path></marker>
+    <marker id="plus-arrow-s5" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#a35543" stroke-width="1.6"></path></marker>
+    </defs><path d="M58 90H548M60 52V300" class="axis"></path>
+    <text x="557" y="99" class="axis-label">x</text><text x="35" y="62" class="axis-label">u</text>
+    <text x="44" y="126" class="tick-label">0</text><text x="535" y="126" class="tick-label">1</text>
+    <path d="M220 99V304" class="guide"></path>
+    <path d="M60 90L220 270" class="curve-minus"></path><path d="M220 270L540 90" class="curve-plus"></path>
+    <circle cx="60" cy="90" r="5" fill="var(--green)"></circle><circle cx="540" cy="90" r="5" fill="var(--red)"></circle>
+    <circle cx="220" cy="270" r="6" fill="var(--ink)"></circle>
+    <text x="220" y="340" text-anchor="middle" class="coordinate-label">a = 1/3</text>
+    <text x="246" y="298" class="tick-label">−2/9</text>
+    <path d="M382 316H484" class="normal" marker-end="url(#arrow-s5)"></path>
+    <text x="510" y="325" class="normal-label">n</text></svg><div class="figure-legend"><span><i class="minus-key" aria-hidden="true"></i>Ω⁻：斜率 a−1</span><span><i class="plus-key" aria-hidden="true"></i>Ω⁺：斜率 a</span></div><figcaption class="caption">原文解析解重繪；接點與斜率計算 <span class="ai">[AI]</span></figcaption></figure><div class="stack"><p class="statement">同一高度，<br>斜率不同。</p><p>各側 u″ = 0<br>兩端 u(0) = u(1) = 0</p><p class="note">此例 β = 1，兩側 f = 0。<br>沒有材料係數跳躍。</p></div></div>
+<div class="equation compact-equation"><div class="math-display" data-tex="u(x)=\begin{cases}(a-1)x,&amp;0\le x<a,\\a(x-1),&amp;a\le x\le1,\end{cases}"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>u</mi>
+  <mo stretchy="false">(</mo>
+  <mi>x</mi>
+  <mo stretchy="false">)</mo>
+  <mo>=</mo>
+  <mrow data-mjx-texclass="INNER">
+    <mo data-mjx-texclass="OPEN">{</mo>
+    <mtable columnspacing="1em" rowspacing=".2em" columnalign="left left">
+      <mtr>
+        <mtd>
+          <mo stretchy="false">(</mo>
+          <mi>a</mi>
+          <mo>−</mo>
+          <mn>1</mn>
+          <mo stretchy="false">)</mo>
+          <mi>x</mi>
+          <mo>,</mo>
+        </mtd>
+        <mtd>
+          <mn>0</mn>
+          <mo>≤</mo>
+          <mi>x</mi>
+          <mo>&lt;</mo>
+          <mi>a</mi>
+          <mo>,</mo>
+        </mtd>
+      </mtr>
+      <mtr>
+        <mtd>
+          <mi>a</mi>
+          <mo stretchy="false">(</mo>
+          <mi>x</mi>
+          <mo>−</mo>
+          <mn>1</mn>
+          <mo stretchy="false">)</mo>
+          <mo>,</mo>
+        </mtd>
+        <mtd>
+          <mi>a</mi>
+          <mo>≤</mo>
+          <mi>x</mi>
+          <mo>≤</mo>
+          <mn>1</mn>
+          <mo>,</mo>
+        </mtd>
+      </mtr>
+    </mtable>
+    <mo data-mjx-texclass="CLOSE" fence="true" stretchy="true" symmetric="true"></mo>
+  </mrow>
+</math></div></div>
+</div><footer class="footer"><span>介面問題 · 圖解筆記</span><span class="page">06</span></footer></section><section class="slide  " id="slide-7" data-content-id="S06" aria-label="Jump 是同一位置的兩側差"><div class="eyebrow"><span>06 / SAME POINT, TWO TRACES</span><span>一步一步，看懂介面。</span></div><h2 id="title-7">Jump 是同一位置的兩側差</h2><p class="lead">比較的是空間兩側極限；全篇固定使用「正側減負側」。</p><div class="content">
+<div class="split wide-figure"><figure class="figure"><svg viewBox="0 0 600 365" role="img" aria-label="依原文解析式繪製的一維折線，兩側在三分之一處接合，最低值負九分之二"><defs>
+    <pattern id="minus-s6" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 24L24 0" stroke="#65775f" stroke-opacity=".10" stroke-width="1"></path></pattern>
+    <pattern id="plus-s6" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.1" fill="#a35543" opacity=".16"></circle></pattern>
+    <marker id="arrow-s6" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#303a33" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></marker>
+    <marker id="minus-arrow-s6" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#65775f" stroke-width="1.6"></path></marker>
+    <marker id="plus-arrow-s6" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#a35543" stroke-width="1.6"></path></marker>
+    </defs><path d="M58 90H548M60 52V300" class="axis"></path>
+    <text x="557" y="99" class="axis-label">x</text><text x="35" y="62" class="axis-label">u</text>
+    <text x="44" y="126" class="tick-label">0</text><text x="535" y="126" class="tick-label">1</text>
+    <path d="M220 99V304" class="guide"></path>
+    <path d="M60 90L220 270" class="curve-minus"></path><path d="M220 270L540 90" class="curve-plus"></path>
+    <circle cx="60" cy="90" r="5" fill="var(--green)"></circle><circle cx="540" cy="90" r="5" fill="var(--red)"></circle>
+    <circle cx="220" cy="270" r="6" fill="var(--ink)"></circle>
+    <text x="220" y="340" text-anchor="middle" class="coordinate-label">a = 1/3</text>
+    <text x="246" y="298" class="tick-label">−2/9</text>
+    <path d="M382 316H484" class="normal" marker-end="url(#arrow-s6)"></path>
+    <text x="510" y="325" class="normal-label">n</text><path d="M136 154Q140 211 200 250" class="trace-minus" marker-end="url(#minus-arrow-s6)"></path>
+        <path d="M334 178Q308 226 243 259" class="trace-plus" marker-end="url(#plus-arrow-s6)"></path></svg><div class="figure-legend"><span><i class="minus-key" aria-hidden="true"></i>u⁻：從左靠近</span><span><i class="plus-key" aria-hidden="true"></i>u⁺：從右靠近</span></div><figcaption class="caption">虛線箭頭表示靠近介面；實線 n 表示法向。極限圖解 <span class="ai">[AI]</span></figcaption></figure><div class="stack"><div class="equation"><div class="math-display" data-tex="[q]=q^+-q^-"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">[</mo>
+  <mi>q</mi>
+  <mo stretchy="false">]</mo>
+  <mo>=</mo>
+  <msup>
+    <mi>q</mi>
+    <mo>+</mo>
+  </msup>
+  <mo>−</mo>
+  <msup>
+    <mi>q</mi>
+    <mo>−</mo>
+  </msup>
+</math></div></div><p>q 是要比較的量，例如 u 或 ∂ₙu。</p><p>q⁻：從 Ω⁻ 靠近<br>q⁺：從 Ω⁺ 靠近</p><p class="small">一維 n 朝右，所以 ∂ₙu 就是對 x 的導數。</p></div></div>
+<div class="equation compact-equation"><div class="math-display" data-tex="[u]=0,\qquad[\partial_nu]=a-(a-1)=1"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">[</mo>
+  <mi>u</mi>
+  <mo stretchy="false">]</mo>
+  <mo>=</mo>
+  <mn>0</mn>
+  <mo>,</mo>
+  <mspace width="2em"></mspace>
+  <mo stretchy="false">[</mo>
+  <msub>
+    <mi>∂</mi>
+    <mi>n</mi>
+  </msub>
+  <mi>u</mi>
+  <mo stretchy="false">]</mo>
+  <mo>=</mo>
+  <mi>a</mi>
+  <mo>−</mo>
+  <mo stretchy="false">(</mo>
+  <mi>a</mi>
+  <mo>−</mo>
+  <mn>1</mn>
+  <mo stretchy="false">)</mo>
+  <mo>=</mo>
+  <mn>1</mn>
+</math></div></div><p class="note">u 的 jump 為零，不表示導數的 jump 也為零。代入驗算 <span class="ai">[AI]</span></p>
+</div><footer class="footer"><span>介面問題 · 圖解筆記</span><span class="page">07</span></footer></section><section class="slide  " id="slide-8" data-content-id="S07" aria-label="通量連續，不代表斜率相同"><div class="eyebrow"><span>07 / DERIVATIVE ≠ WEIGHTED FLUX</span><span>一步一步，看懂介面。</span></div><h2 id="title-8">通量連續，不代表斜率相同</h2><p class="lead">條件約束的是 β∂ₙu；必須區分導數與加權通量。</p><div class="content">
+<div class="equation"><div class="math-display" data-tex="[\beta\partial_nu]=0"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">[</mo>
+  <mi>β</mi>
+  <msub>
+    <mi>∂</mi>
+    <mi>n</mi>
+  </msub>
+  <mi>u</mi>
+  <mo stretchy="false">]</mo>
+  <mo>=</mo>
+  <mn>0</mn>
+</math></div><div class="math-display" data-tex="\Longleftrightarrow\quad\beta^+\partial_nu^+=\beta^-\partial_nu^-"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">⟺</mo>
+  <mspace width="1em"></mspace>
+  <msup>
+    <mi>β</mi>
+    <mo>+</mo>
+  </msup>
+  <msub>
+    <mi>∂</mi>
+    <mi>n</mi>
+  </msub>
+  <msup>
+    <mi>u</mi>
+    <mo>+</mo>
+  </msup>
+  <mo>=</mo>
+  <msup>
+    <mi>β</mi>
+    <mo>−</mo>
+  </msup>
+  <msub>
+    <mi>∂</mi>
+    <mi>n</mi>
+  </msub>
+  <msup>
+    <mi>u</mi>
+    <mo>−</mo>
+  </msup>
+</math></div></div>
+<div class="pair"><div><h3>Ω⁻ · 負側</h3><div class="multiply"><div><div class="math-display" data-tex="\beta^-"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msup>
+    <mi>β</mi>
+    <mo>−</mo>
+  </msup>
+</math></div><p>材料係數</p></div><span>×</span><div><div class="math-display" data-tex="\partial_nu^-"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msub>
+    <mi>∂</mi>
+    <mi>n</mi>
+  </msub>
+  <msup>
+    <mi>u</mi>
+    <mo>−</mo>
+  </msup>
+</math></div><p>法向導數</p></div></div></div><div><h3>Ω⁺ · 正側</h3><div class="multiply"><div><div class="math-display" data-tex="\beta^+"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msup>
+    <mi>β</mi>
+    <mo>+</mo>
+  </msup>
+</math></div><p>材料係數</p></div><span>×</span><div><div class="math-display" data-tex="\partial_nu^+"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msub>
+    <mi>∂</mi>
+    <mi>n</mi>
+  </msub>
+  <msup>
+    <mi>u</mi>
+    <mo>+</mo>
+  </msup>
+</math></div><p>法向導數</p></div></div></div></div>
+<p class="statement">乘積相等，兩個導數不一定相等。<span class="ai">[AI]</span></p>
+<div class="note"><p>此張改看「加權通量 jump 為零」；前面的折線例子是 β = 1、導數 jump 為 1，設定不同。</p><p class="small">符號慣例：這裡的加權法向通量為 β∂ₙu；導熱的物理法向熱流則是 −β∂ₙu。<span class="ai">[AI]</span></p></div>
+</div><footer class="footer"><span>介面問題 · 圖解筆記</span><span class="page">08</span></footer></section><section class="slide  " id="slide-9" data-content-id="S08" aria-label="把完整問題放在同一張圖上"><div class="eyebrow"><span>08 / THE COMPLETE PROBLEM</span><span>一步一步，看懂介面。</span></div><h2 id="title-9">把完整問題放在同一張圖上</h2><p class="lead">兩側方程、兩個 jump conditions 與外邊界，共同定義待解問題。</p><div class="content">
+<div class="split"><figure class="figure"><svg viewBox="0 0 600 365" role="img" aria-label="同一個方形區域、同一個圓介面，負側在內、正側在外"><defs>
+    <pattern id="minus-s8" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 24L24 0" stroke="#65775f" stroke-opacity=".10" stroke-width="1"></path></pattern>
+    <pattern id="plus-s8" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.1" fill="#a35543" opacity=".16"></circle></pattern>
+    <marker id="arrow-s8" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#303a33" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></marker>
+    <marker id="minus-arrow-s8" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#65775f" stroke-width="1.6"></path></marker>
+    <marker id="plus-arrow-s8" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#a35543" stroke-width="1.6"></path></marker>
+    </defs><rect x="52" y="35" width="496" height="274" rx="3" fill="#f0e7df"></rect>
+    <rect x="52" y="35" width="496" height="274" rx="3" fill="url(#plus-s8)"></rect>
+    <circle cx="270" cy="172" r="101" fill="#e0e7da"></circle>
+    <circle cx="270" cy="172" r="101" fill="url(#minus-s8)"></circle>
+    <rect x="52" y="35" width="496" height="274" rx="3" class="domain-edge"></rect>
+    <circle cx="270" cy="172" r="101" class="interface"></circle><text x="270" y="171" text-anchor="middle" class="region-symbol minus">Ω⁻</text>
+        <text x="455" y="171" text-anchor="middle" class="region-symbol plus">Ω⁺</text><path d="M341 101L395 47" class="normal" marker-end="url(#arrow-s8)"></path>
+            <text x="413" y="75" class="normal-label">n</text>
+            <path d="M198 243L153 329L121 329" class="callout"></path>
+            <text x="90" y="339" class="region-symbol">Γ</text>
+            <text x="508" y="342" class="region-symbol">∂Ω</text></svg><div class="figure-legend"><span><i class="minus-key" aria-hidden="true"></i>Ω⁻：介面內側</span><span><i class="plus-key" aria-hidden="true"></i>Ω⁺：介面外側</span></div><figcaption class="caption">同一個區域、同一個法向；條件對位示意 <span class="ai">[AI]</span></figcaption></figure><div class="stack"><div class="condition"><div class="math-display" data-tex="\nabla\cdot(\beta\nabla u)=f"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi mathvariant="normal">∇</mi>
+  <mo>⋅</mo>
+  <mo stretchy="false">(</mo>
+  <mi>β</mi>
+  <mi mathvariant="normal">∇</mi>
+  <mi>u</mi>
+  <mo stretchy="false">)</mo>
+  <mo>=</mo>
+  <mi>f</mi>
+</math></div><p>於 Ω⁻ ∪ Ω⁺ · 兩側內部</p></div><div class="condition"><div class="math-display" data-tex="[u]=w"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">[</mo>
+  <mi>u</mi>
+  <mo stretchy="false">]</mo>
+  <mo>=</mo>
+  <mi>w</mi>
+</math></div><p>於 Γ · w：已知的解跳躍</p></div><div class="condition"><div class="math-display" data-tex="[\beta\partial_nu]=v"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo stretchy="false">[</mo>
+  <mi>β</mi>
+  <msub>
+    <mi>∂</mi>
+    <mi>n</mi>
+  </msub>
+  <mi>u</mi>
+  <mo stretchy="false">]</mo>
+  <mo>=</mo>
+  <mi>v</mi>
+</math></div><p>於 Γ · v：已知的加權法向通量跳躍</p></div><div class="condition"><div class="math-display" data-tex="u=g"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mi>u</mi>
+  <mo>=</mo>
+  <mi>g</mi>
+</math></div><p>於 ∂Ω · 已知邊界值</p></div></div></div>
+<p class="note">β &gt; 0；資料可以隨位置變化，介面與各側資料須具備推導所需的光滑性。此處不含反應項；介面奇異來源由 jump conditions 表示。</p>
+</div><footer class="footer"><span>介面問題 · 圖解筆記</span><span class="page">09</span></footer></section><section class="slide  " id="slide-10" data-content-id="S09" aria-label="電腦用鄰近格點近似導數"><div class="eyebrow"><span>09 / FROM CURVE TO GRID</span><span>一步一步，看懂介面。</span></div><h2 id="title-10">電腦用鄰近格點近似導數</h2><p class="lead">有限差分，把連續問題轉成有限個格點未知量。</p><div class="content">
+<div class="split"><figure class="figure"><svg viewBox="0 0 600 375" role="img" aria-label="函數上的三個取樣點，虛線投影到下方等距網格"><defs>
+    <pattern id="minus-s9" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 24L24 0" stroke="#65775f" stroke-opacity=".10" stroke-width="1"></path></pattern>
+    <pattern id="plus-s9" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.1" fill="#a35543" opacity=".16"></circle></pattern>
+    <marker id="arrow-s9" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#303a33" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></marker>
+    <marker id="minus-arrow-s9" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#65775f" stroke-width="1.6"></path></marker>
+    <marker id="plus-arrow-s9" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#a35543" stroke-width="1.6"></path></marker>
+    </defs><path d="M80 172Q300 -2 520 172" class="curve-minus"></path><path d="M55 257H545" class="grid-baseline"></path><path d="M100 165.9V251" class="projection-guide"></path>
+        <circle cx="100" cy="156.9" r="6" fill="var(--ink)"></circle>
+        <circle cx="100" cy="257" r="4" fill="var(--ink)"></circle>
+        <text x="100" y="289" text-anchor="middle" class="grid-label">xᵢ₋₁</text><text x="100" y="124.9" text-anchor="middle" class="grid-label">uᵢ₋₁</text><path d="M300 94V251" class="projection-guide"></path>
+        <circle cx="300" cy="85" r="6" fill="var(--ink)"></circle>
+        <circle cx="300" cy="257" r="4" fill="var(--ink)"></circle>
+        <text x="300" y="289" text-anchor="middle" class="grid-label">xᵢ</text><text x="300" y="53" text-anchor="middle" class="grid-label">uᵢ</text><path d="M500 165.9V251" class="projection-guide"></path>
+        <circle cx="500" cy="156.9" r="6" fill="var(--ink)"></circle>
+        <circle cx="500" cy="257" r="4" fill="var(--ink)"></circle>
+        <text x="500" y="289" text-anchor="middle" class="grid-label">xᵢ₊₁</text><text x="500" y="124.9" text-anchor="middle" class="grid-label">uᵢ₊₁</text><path d="M100 316V326H300V316M300 326H500V316" class="dimension"></path>
+        <text x="200" y="354" text-anchor="middle" class="grid-label">h</text>
+        <text x="400" y="354" text-anchor="middle" class="grid-label">h</text></svg><figcaption class="caption">三點均勻網格；曲線為示意 <span class="ai">[AI]</span></figcaption></figure><div class="stack"><p>h：相鄰格點距離<br>uᵢ：u(xᵢ) 的數值近似</p><p class="small">Stencil：這條差分式用到的鄰近格點。<br>先看 β = 1、足夠光滑的區間。</p><div class="equation"><div class="math-display" data-tex="\frac{u_{i-1}-2u_i+u_{i+1}}{h^2}\approx\frac{d^2u}{dx^2}(x_i)"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mfrac>
+    <mrow>
+      <msub>
+        <mi>u</mi>
+        <mrow data-mjx-texclass="ORD">
+          <mi>i</mi>
+          <mo>−</mo>
+          <mn>1</mn>
+        </mrow>
+      </msub>
+      <mo>−</mo>
+      <mn>2</mn>
+      <msub>
+        <mi>u</mi>
+        <mi>i</mi>
+      </msub>
+      <mo>+</mo>
+      <msub>
+        <mi>u</mi>
+        <mrow data-mjx-texclass="ORD">
+          <mi>i</mi>
+          <mo>+</mo>
+          <mn>1</mn>
+        </mrow>
+      </msub>
+    </mrow>
+    <msup>
+      <mi>h</mi>
+      <mn>2</mn>
+    </msup>
+  </mfrac>
+  <mo>≈</mo>
+  <mfrac>
+    <mrow>
+      <msup>
+        <mi>d</mi>
+        <mn>2</mn>
+      </msup>
+      <mi>u</mi>
+    </mrow>
+    <mrow>
+      <mi>d</mi>
+      <msup>
+        <mi>x</mi>
+        <mn>2</mn>
+      </msup>
+    </mrow>
+  </mfrac>
+  <mo stretchy="false">(</mo>
+  <msub>
+    <mi>x</mi>
+    <mi>i</mi>
+  </msub>
+  <mo stretchy="false">)</mo>
+</math></div></div><p class="small">右斜率 − 左斜率，再除以 h：<span class="ai">[AI]</span></p><div class="compact-equation"><div class="math-display" data-tex="\frac{1}{h}\left(\frac{u_{i+1}-u_i}{h}-\frac{u_i-u_{i-1}}{h}\right)"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mfrac>
+    <mn>1</mn>
+    <mi>h</mi>
+  </mfrac>
+  <mrow data-mjx-texclass="INNER">
+    <mo data-mjx-texclass="OPEN">(</mo>
+    <mfrac>
+      <mrow>
+        <msub>
+          <mi>u</mi>
+          <mrow data-mjx-texclass="ORD">
+            <mi>i</mi>
+            <mo>+</mo>
+            <mn>1</mn>
+          </mrow>
+        </msub>
+        <mo>−</mo>
+        <msub>
+          <mi>u</mi>
+          <mi>i</mi>
+        </msub>
+      </mrow>
+      <mi>h</mi>
+    </mfrac>
+    <mo>−</mo>
+    <mfrac>
+      <mrow>
+        <msub>
+          <mi>u</mi>
+          <mi>i</mi>
+        </msub>
+        <mo>−</mo>
+        <msub>
+          <mi>u</mi>
+          <mrow data-mjx-texclass="ORD">
+            <mi>i</mi>
+            <mo>−</mo>
+            <mn>1</mn>
+          </mrow>
+        </msub>
+      </mrow>
+      <mi>h</mi>
+    </mfrac>
+    <mo data-mjx-texclass="CLOSE">)</mo>
+  </mrow>
+</math></div></div></div></div><p class="note">有足夠高階導數時，局部截斷誤差為 O(h²)：h 變小，誤差量級隨 h² 縮小。記號說明 <span class="ai">[AI]</span></p>
+</div><footer class="footer"><span>介面問題 · 圖解筆記</span><span class="page">10</span></footer></section><section class="slide  " id="slide-11" data-content-id="S10" aria-label="介面穿過格點之間，會發生什麼？"><div class="eyebrow"><span>10 / WHERE SMOOTHNESS BREAKS</span><span>一步一步，看懂介面。</span></div><h2 id="title-11">介面穿過格點之間，會發生什麼？</h2><p class="lead">跨介面的 stencil，不能直接沿用同一個光滑展開。</p><div class="content">
+<div class="pair"><div><h3>光滑區 · 同一側</h3><figure class="figure"><svg viewBox="0 0 600 375" role="img" aria-label="函數上的三個取樣點，虛線投影到下方等距網格"><defs>
+    <pattern id="minus-s10a" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 24L24 0" stroke="#65775f" stroke-opacity=".10" stroke-width="1"></path></pattern>
+    <pattern id="plus-s10a" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.1" fill="#a35543" opacity=".16"></circle></pattern>
+    <marker id="arrow-s10a" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#303a33" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></marker>
+    <marker id="minus-arrow-s10a" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#65775f" stroke-width="1.6"></path></marker>
+    <marker id="plus-arrow-s10a" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#a35543" stroke-width="1.6"></path></marker>
+    </defs><path d="M80 172Q300 -2 520 172" class="curve-minus"></path><path d="M55 257H545" class="grid-baseline"></path><path d="M100 165.9V251" class="projection-guide"></path>
+        <circle cx="100" cy="156.9" r="6" fill="var(--ink)"></circle>
+        <circle cx="100" cy="257" r="4" fill="var(--ink)"></circle>
+        <text x="100" y="289" text-anchor="middle" class="grid-label">xᵢ₋₁</text><text x="100" y="124.9" text-anchor="middle" class="grid-label">uᵢ₋₁</text><path d="M300 94V251" class="projection-guide"></path>
+        <circle cx="300" cy="85" r="6" fill="var(--ink)"></circle>
+        <circle cx="300" cy="257" r="4" fill="var(--ink)"></circle>
+        <text x="300" y="289" text-anchor="middle" class="grid-label">xᵢ</text><text x="300" y="53" text-anchor="middle" class="grid-label">uᵢ</text><path d="M500 165.9V251" class="projection-guide"></path>
+        <circle cx="500" cy="156.9" r="6" fill="var(--ink)"></circle>
+        <circle cx="500" cy="257" r="4" fill="var(--ink)"></circle>
+        <text x="500" y="289" text-anchor="middle" class="grid-label">xᵢ₊₁</text><text x="500" y="124.9" text-anchor="middle" class="grid-label">uᵢ₊₁</text><path d="M100 316V326H300V316M300 326H500V316" class="dimension"></path>
+        <text x="200" y="354" text-anchor="middle" class="grid-label">h</text>
+        <text x="400" y="354" text-anchor="middle" class="grid-label">h</text></svg><figcaption class="caption">可使用同一側的 Taylor 展開；示意 <span class="ai">[AI]</span></figcaption></figure></div><div><h3>跨介面 · 不同側</h3><figure class="figure"><svg viewBox="0 0 600 375" role="img" aria-label="函數上的三個取樣點，虛線投影到下方等距網格；介面在中間與右側格點之間"><defs>
+    <pattern id="minus-s10b" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 24L24 0" stroke="#65775f" stroke-opacity=".10" stroke-width="1"></path></pattern>
+    <pattern id="plus-s10b" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.1" fill="#a35543" opacity=".16"></circle></pattern>
+    <marker id="arrow-s10b" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#303a33" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></marker>
+    <marker id="minus-arrow-s10b" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#65775f" stroke-width="1.6"></path></marker>
+    <marker id="plus-arrow-s10b" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#a35543" stroke-width="1.6"></path></marker>
+    </defs><rect x="54" y="30" width="306" height="205" rx="3" fill="#e0e7da"></rect>
+        <rect x="54" y="30" width="306" height="205" fill="url(#minus-s10b)"></rect>
+        <rect x="360" y="30" width="188" height="205" rx="3" fill="#f0e7df"></rect>
+        <rect x="360" y="30" width="188" height="205" fill="url(#plus-s10b)"></rect>
+        <path d="M360 35V242" class="interface"></path>
+        <path d="M100 65L360 195" class="curve-minus"></path><path d="M360 195L500 160" class="curve-plus"></path>
+        <text x="168" y="215" class="region-symbol minus">Ω⁻</text><text x="425" y="215" class="region-symbol plus">Ω⁺</text>
+        <text x="369" y="320" class="coordinate-label">a = 1/3</text><path d="M55 257H545" class="grid-baseline"></path><path d="M100 74V251" class="projection-guide"></path>
+        <circle cx="100" cy="65" r="6" fill="var(--ink)"></circle>
+        <circle cx="100" cy="257" r="4" fill="var(--ink)"></circle>
+        <text x="100" y="289" text-anchor="middle" class="grid-label">xᵢ₋₁</text><path d="M300 174V251" class="projection-guide"></path>
+        <circle cx="300" cy="165" r="6" fill="var(--ink)"></circle>
+        <circle cx="300" cy="257" r="4" fill="var(--ink)"></circle>
+        <text x="300" y="289" text-anchor="middle" class="grid-label">xᵢ</text><path d="M500 169V251" class="projection-guide"></path>
+        <circle cx="500" cy="160" r="6" fill="var(--ink)"></circle>
+        <circle cx="500" cy="257" r="4" fill="var(--ink)"></circle>
+        <text x="500" y="289" text-anchor="middle" class="grid-label">xᵢ₊₁</text></svg><figcaption class="caption">局部折線示意（非解值座標），a 介於 xᵢ 與 xᵢ₊₁。<span class="ai">[AI]</span></figcaption></figure></div></div>
+<p>Taylor 展開，用某一點的值與導數描述附近函數。跨過介面時，兩側導數可能不同，必須把兩側展開與 jump 資訊一起處理。</p><p class="note">把網格加密，並不會自動讓跨介面的光滑假設成立。<span class="ai">[AI]</span></p>
+</div><footer class="footer"><span>介面問題 · 圖解筆記</span><span class="page">11</span></footer></section><section class="slide  " id="slide-12" data-content-id="S11" aria-label="IIM 把 jump 資訊放回差分式"><div class="eyebrow"><span>11 / IMMERSED INTERFACE METHOD</span><span>一步一步，看懂介面。</span></div><h2 id="title-12">IIM 把 jump 資訊放回差分式</h2><p class="lead">透過兩側展開、jump relations 與 PDE，決定局部修正。</p><div class="content">
+<div class="split"><div class="numbered"><div><span class="step-number">01</span><div><h3>找到介面</h3><p>在受影響的 stencil 附近選介面點。</p></div></div><div><span class="step-number">02</span><div><h3>連接兩側</h3><p>各側分別展開，再用 jump conditions 與 PDE 連接值和導數。</p></div></div><div><span class="step-number">03</span><div><h3>決定修正</h3><p>讓差分係數與右端符合所需關係。</p></div></div></div><figure class="figure"><svg viewBox="0 0 600 375" role="img" aria-label="函數上的三個取樣點，虛線投影到下方等距網格；介面在中間與右側格點之間"><defs>
+    <pattern id="minus-s11" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 24L24 0" stroke="#65775f" stroke-opacity=".10" stroke-width="1"></path></pattern>
+    <pattern id="plus-s11" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.1" fill="#a35543" opacity=".16"></circle></pattern>
+    <marker id="arrow-s11" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#303a33" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></marker>
+    <marker id="minus-arrow-s11" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#65775f" stroke-width="1.6"></path></marker>
+    <marker id="plus-arrow-s11" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#a35543" stroke-width="1.6"></path></marker>
+    </defs><rect x="54" y="30" width="306" height="205" rx="3" fill="#e0e7da"></rect>
+        <rect x="54" y="30" width="306" height="205" fill="url(#minus-s11)"></rect>
+        <rect x="360" y="30" width="188" height="205" rx="3" fill="#f0e7df"></rect>
+        <rect x="360" y="30" width="188" height="205" fill="url(#plus-s11)"></rect>
+        <path d="M360 35V242" class="interface"></path>
+        <path d="M100 65L360 195" class="curve-minus"></path><path d="M360 195L500 160" class="curve-plus"></path>
+        <text x="168" y="215" class="region-symbol minus">Ω⁻</text><text x="425" y="215" class="region-symbol plus">Ω⁺</text>
+        <text x="369" y="320" class="coordinate-label">a = 1/3</text><path d="M55 257H545" class="grid-baseline"></path><path d="M100 74V251" class="projection-guide"></path>
+        <circle cx="100" cy="65" r="6" fill="var(--ink)"></circle>
+        <circle cx="100" cy="257" r="4" fill="var(--ink)"></circle>
+        <text x="100" y="289" text-anchor="middle" class="grid-label">xᵢ₋₁</text><path d="M300 174V251" class="projection-guide"></path>
+        <circle cx="300" cy="165" r="6" fill="var(--ink)"></circle>
+        <circle cx="300" cy="257" r="4" fill="var(--ink)"></circle>
+        <text x="300" y="289" text-anchor="middle" class="grid-label">xᵢ</text><path d="M500 169V251" class="projection-guide"></path>
+        <circle cx="500" cy="160" r="6" fill="var(--ink)"></circle>
+        <circle cx="500" cy="257" r="4" fill="var(--ink)"></circle>
+        <text x="500" y="289" text-anchor="middle" class="grid-label">xᵢ₊₁</text></svg><figcaption class="caption">局部曲線示意（非解值座標）；兩側資訊 → 局部修正。<span class="ai">[AI]</span></figcaption></figure></div>
+<div class="equation compact-equation"><div class="formula-wide"><div class="math-display" data-tex="\gamma_{i,1}u_{i-1}+\gamma_{i,2}u_i+\gamma_{i,3}u_{i+1}=f(x_i)+C_i"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <msub>
+    <mi>γ</mi>
+    <mrow data-mjx-texclass="ORD">
+      <mi>i</mi>
+      <mo>,</mo>
+      <mn>1</mn>
+    </mrow>
+  </msub>
+  <msub>
+    <mi>u</mi>
+    <mrow data-mjx-texclass="ORD">
+      <mi>i</mi>
+      <mo>−</mo>
+      <mn>1</mn>
+    </mrow>
+  </msub>
+  <mo>+</mo>
+  <msub>
+    <mi>γ</mi>
+    <mrow data-mjx-texclass="ORD">
+      <mi>i</mi>
+      <mo>,</mo>
+      <mn>2</mn>
+    </mrow>
+  </msub>
+  <msub>
+    <mi>u</mi>
+    <mi>i</mi>
+  </msub>
+  <mo>+</mo>
+  <msub>
+    <mi>γ</mi>
+    <mrow data-mjx-texclass="ORD">
+      <mi>i</mi>
+      <mo>,</mo>
+      <mn>3</mn>
+    </mrow>
+  </msub>
+  <msub>
+    <mi>u</mi>
+    <mrow data-mjx-texclass="ORD">
+      <mi>i</mi>
+      <mo>+</mo>
+      <mn>1</mn>
+    </mrow>
+  </msub>
+  <mo>=</mo>
+  <mi>f</mi>
+  <mo stretchy="false">(</mo>
+  <msub>
+    <mi>x</mi>
+    <mi>i</mi>
+  </msub>
+  <mo stretchy="false">)</mo>
+  <mo>+</mo>
+  <msub>
+    <mi>C</mi>
+    <mi>i</mi>
+  </msub>
+</math></div></div><div class="formula-narrow"><div class="math-display" data-tex="\begin{aligned}&amp;\gamma_{i,1}u_{i-1}+\gamma_{i,2}u_i\\&amp;+\gamma_{i,3}u_{i+1}\\&amp;=f(x_i)+C_i\end{aligned}"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mtable displaystyle="true" columnalign="right left" columnspacing="0em" rowspacing="3pt" data-break-align="bottom top">
+    <mtr>
+      <mtd></mtd>
+      <mtd>
+        <mstyle indentshift="2em">
+          <msub>
+            <mi>γ</mi>
+            <mrow data-mjx-texclass="ORD">
+              <mi>i</mi>
+              <mo>,</mo>
+              <mn>1</mn>
+            </mrow>
+          </msub>
+          <msub>
+            <mi>u</mi>
+            <mrow data-mjx-texclass="ORD">
+              <mi>i</mi>
+              <mo>−</mo>
+              <mn>1</mn>
+            </mrow>
+          </msub>
+          <mo>+</mo>
+          <msub>
+            <mi>γ</mi>
+            <mrow data-mjx-texclass="ORD">
+              <mi>i</mi>
+              <mo>,</mo>
+              <mn>2</mn>
+            </mrow>
+          </msub>
+          <msub>
+            <mi>u</mi>
+            <mi>i</mi>
+          </msub>
+        </mstyle>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd></mtd>
+      <mtd>
+        <mstyle indentshift="2em">
+          <mi></mi>
+          <mo>+</mo>
+          <msub>
+            <mi>γ</mi>
+            <mrow data-mjx-texclass="ORD">
+              <mi>i</mi>
+              <mo>,</mo>
+              <mn>3</mn>
+            </mrow>
+          </msub>
+          <msub>
+            <mi>u</mi>
+            <mrow data-mjx-texclass="ORD">
+              <mi>i</mi>
+              <mo>+</mo>
+              <mn>1</mn>
+            </mrow>
+          </msub>
+        </mstyle>
+      </mtd>
+    </mtr>
+    <mtr>
+      <mtd></mtd>
+      <mtd>
+        <mstyle indentshift="2em">
+          <mi></mi>
+          <mo>=</mo>
+          <mi>f</mi>
+          <mo stretchy="false">(</mo>
+          <msub>
+            <mi>x</mi>
+            <mi>i</mi>
+          </msub>
+          <mo stretchy="false">)</mo>
+          <mo>+</mo>
+          <msub>
+            <mi>C</mi>
+            <mi>i</mi>
+          </msub>
+        </mstyle>
+      </mtd>
+    </mtr>
+  </mtable>
+</math></div></div><p class="caption">一維形式 · γᵢ,₁、γᵢ,₂、γᵢ,₃：差分係數；Cᵢ：右端修正。</p></div>
+<div class="pair"><div><h3>一般係數跳躍</h3><p>可能同時改係數與右端。<br>二維原文一般使用六點 stencil。</p></div><div><h3>常係數 Poisson 特例</h3><p>可保留標準差分係數，<br>只修正右端。</p></div></div>
+</div><footer class="footer"><span>介面問題 · 圖解筆記</span><span class="page">12</span></footer></section><section class="slide  result" id="slide-13" data-content-id="S12" aria-label="怎麼看 IIM 的精度結果？"><div class="eyebrow"><span>12 / READ THE EVIDENCE</span><span>一步一步，看懂介面。</span></div><h2 id="title-13">怎麼看 IIM 的精度結果？</h2><p class="lead">局部截斷誤差與全域解誤差，是兩個不同的量。</p><div class="content">
+<div class="split"><div><figure class="figure"><svg viewBox="0 0 600 365" role="img" aria-label="同一個方形區域、同一個圓介面，負側在內、正側在外"><defs>
+    <pattern id="minus-s12" width="24" height="24" patternUnits="userSpaceOnUse"><path d="M0 24L24 0" stroke="#65775f" stroke-opacity=".10" stroke-width="1"></path></pattern>
+    <pattern id="plus-s12" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="8" cy="8" r="1.1" fill="#a35543" opacity=".16"></circle></pattern>
+    <marker id="arrow-s12" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#303a33" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"></path></marker>
+    <marker id="minus-arrow-s12" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#65775f" stroke-width="1.6"></path></marker>
+    <marker id="plus-arrow-s12" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M1 1L6 4L1 7" fill="none" stroke="#a35543" stroke-width="1.6"></path></marker>
+    </defs><rect x="52" y="35" width="496" height="274" rx="3" fill="#f0e7df"></rect>
+    <rect x="52" y="35" width="496" height="274" rx="3" fill="url(#plus-s12)"></rect>
+    <circle cx="270" cy="172" r="101" fill="#e0e7da"></circle>
+    <circle cx="270" cy="172" r="101" fill="url(#minus-s12)"></circle>
+    <rect x="52" y="35" width="496" height="274" rx="3" class="domain-edge"></rect>
+    <circle cx="270" cy="172" r="101" class="interface"></circle><text x="270" y="171" text-anchor="middle" class="region-symbol minus">Ω⁻</text>
+        <text x="455" y="171" text-anchor="middle" class="region-symbol plus">Ω⁺</text><path d="M341 101L395 47" class="normal" marker-end="url(#arrow-s12)"></path>
+            <text x="413" y="75" class="normal-label">n</text>
+            <path d="M198 243L153 329L121 329" class="callout"></path>
+            <text x="90" y="339" class="region-symbol">Γ</text>
+            <text x="508" y="342" class="region-symbol">∂Ω</text></svg><div class="figure-legend"><span><i class="minus-key" aria-hidden="true"></i>Ω⁻：介面內側</span><span><i class="plus-key" aria-hidden="true"></i>Ω⁺：介面外側</span></div><figcaption class="caption">Ω = [−1,1]²；圓半徑 1/2。設定示意 <span class="ai">[AI]</span></figcaption></figure><p class="small">β = 1，各側 f = 0；w = 0，v = 2。<br>外邊界由原文精確解指定。此為二維測試。</p></div><div><table><thead><tr><th>N（原文 n）</th><th>全域解最大誤差 ‖E<sub>N</sub>‖∞</th></tr></thead><tbody><tr><td>80</td><td>2.4451 × 10⁻⁴</td></tr><tr><td>160</td><td>6.6856 × 10⁻⁵</td></tr><tr><td>320</td><td>1.5672 × 10⁻⁵</td></tr></tbody></table><p class="caption">N：各方向網格細分數，h = 2/N。<br>原文 Table 1 數據，未重現實驗。</p><p class="result-ratios">網格加密一倍，誤差縮小約 <strong>3.66、4.27 倍</strong>，呈現二階趨勢。</p><div class="equation compact-equation"><div class="math-display" data-tex="\|E_N\|_\infty=\max_{i,j}|u(x_i,y_j)-u_{ij}|"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+  <mo data-mjx-texclass="ORD" fence="false" stretchy="false">‖</mo>
+  <msub>
+    <mi>E</mi>
+    <mi>N</mi>
+  </msub>
+  <msub>
+    <mo data-mjx-texclass="ORD" fence="false" stretchy="false">‖</mo>
+    <mi mathvariant="normal">∞</mi>
+  </msub>
+  <mo>=</mo>
+  <munder>
+    <mo data-mjx-texclass="OP" movablelimits="true">max</mo>
+    <mrow data-mjx-texclass="ORD">
+      <mi>i</mi>
+      <mo>,</mo>
+      <mi>j</mi>
+    </mrow>
+  </munder>
+  <mo data-mjx-texclass="ORD" stretchy="false">|</mo>
+  <mi>u</mi>
+  <mo stretchy="false">(</mo>
+  <msub>
+    <mi>x</mi>
+    <mi>i</mi>
+  </msub>
+  <mo>,</mo>
+  <msub>
+    <mi>y</mi>
+    <mi>j</mi>
+  </msub>
+  <mo stretchy="false">)</mo>
+  <mo>−</mo>
+  <msub>
+    <mi>u</mi>
+    <mrow data-mjx-texclass="ORD">
+      <mi>i</mi>
+      <mi>j</mi>
+    </mrow>
+  </msub>
+  <mo data-mjx-texclass="ORD" stretchy="false">|</mo>
+</math></div><p class="caption">uᵢⱼ：二維格點數值近似；i、j：兩個方向的索引。</p></div></div></div>
+
+<div class="pair error-pair"><div><h3>局部截斷誤差</h3><p>把精確解代回離散式的殘差。<br>光滑區 O(h²)，介面附近 O(h)。</p></div><div><h3>全域解誤差</h3><p>解出系統後，數值解與精確解的差。<br>此測試呈現 O(h²) 趨勢。</p></div></div><p class="small">指定測試的數值結果，不是任意介面、係數或離散方式的一般保證。</p>
+</div><footer class="footer"><span>介面問題 · 圖解筆記</span><span class="page">13</span></footer></section></div><nav class="controls" aria-label="簡報翻頁"><span id="page-counter" class="counter" aria-live="polite">01 / 13</span><div class="progress" aria-hidden="true"><span id="progress-fill"></span></div><span class="hint">← → 翻頁 · Home / End</span><button id="prev-slide" aria-label="上一張" disabled="">←</button><button id="next-slide" aria-label="下一張">→</button></nav></main></div></body></html>

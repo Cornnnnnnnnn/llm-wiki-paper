@@ -1,0 +1,14 @@
+(() => {
+  const rows=[...document.querySelectorAll('.paper-row')], search=document.querySelector('#paper-search');
+  let category='all';
+  function filter(){let visible=0;const q=search.value.trim().toLocaleLowerCase();for(const row of rows){row.hidden=!(category==='all'||row.dataset.category===category)||!row.textContent.toLocaleLowerCase().concat(' ',row.dataset.search.toLocaleLowerCase()).includes(q);if(!row.hidden)visible++}document.querySelector('#empty-search').hidden=visible!==0}
+  for(const button of document.querySelectorAll('[data-filter]'))button.addEventListener('click',()=>{category=button.dataset.filter;document.querySelectorAll('[data-filter]').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',String(b===button))});filter()});search.addEventListener('input',filter);
+  const dialog=document.querySelector('#note-dialog'),content=document.querySelector('#reader-content'),toc=document.querySelector('#reader-toc'),back=document.querySelector('#reader-back');
+  let history=[],current=null,opener=null;
+  function showNote(id,anchor='',push=true){const note=window.WIKI_NOTES?.[id];if(!note)return;if(!dialog.open){opener=document.activeElement;dialog.showModal();document.body.style.overflow='hidden'}if(push&&current&&current!==id)history.push(current);current=id;content.innerHTML=note.html;const h1=content.querySelector('h1');if(h1)h1.id='reader-title';toc.replaceChildren();content.querySelectorAll('h2').forEach((heading,i)=>{heading.id=heading.id||'note-section-'+i;const a=document.createElement('a');a.textContent=heading.textContent;a.href='#'+heading.id;a.addEventListener('click',e=>{e.preventDefault();heading.scrollIntoView({behavior:'smooth',block:'start'})});toc.append(a)});back.disabled=!history.length;document.querySelector('#reader-kind').textContent=id.includes('/papers/')?'PAPER NOTE / 原文閱讀':id.includes('/concepts/')?'CONCEPT NOTE / 概念整理':id.includes('/synthesis/')?'CONNECTED NOTES / 跨篇閱讀':'WIKI / 研究紀錄';dialog.scrollTop=0;if(anchor){const found=[...content.querySelectorAll('h1,h2,h3')].find(h=>h.textContent===anchor);found?.scrollIntoView()} }
+  document.addEventListener('click',e=>{const trigger=e.target.closest('[data-note]');if(trigger){e.preventDefault();showNote(trigger.dataset.note,trigger.dataset.anchor||'')}});
+  back.addEventListener('click',()=>{if(history.length)showNote(history.pop(),'',false)});
+  document.querySelector('#reader-close').addEventListener('click',()=>dialog.close());
+  dialog.addEventListener('click',e=>{if(e.target===dialog){const r=dialog.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)dialog.close()}});
+  dialog.addEventListener('close',()=>{document.body.style.overflow='';history=[];current=null;opener?.focus()});
+})();

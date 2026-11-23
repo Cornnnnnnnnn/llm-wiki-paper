@@ -1,0 +1,18 @@
+{
+  "pages": [
+    "index.html",
+    "poisson-interface-v0.html",
+    "poisson-interface.html"
+  ],
+  "notes": 20,
+  "papers": [
+    "2106.05587v3.pdf",
+    "2210.08424v2.pdf",
+    "HLM18.pdf",
+    "HLY15.pdf",
+    "gibou2005.pdf",
+    "iim1994.pdf"
+  ],
+  "sourceDigest": "a3a099e0463bb4b5020cb1bfd5a34c70ddbd202ce10d31400c457ce5cb9764e3",
+  "basePath": "/llm-wiki-paper/"
+}

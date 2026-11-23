@@ -1,0 +1,73 @@
+<!DOCTYPE html><html lang="zh-Hant"><head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f8f8f5">
+  <meta name="description" content="以六篇論文為起點，整理 IIM、interface methods 與 neural interface solvers 的研究筆記。">
+  <title>界面研究室 — Interface Notes</title>
+  <link rel="stylesheet" href="assets/wiki.css">
+  <script defer="" src="assets/notes.js"></script><script defer="" src="assets/wiki.js"></script>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml"></head>
+<body>
+<a class="skip" href="#papers">跳到論文筆記</a>
+<div class="site-shell">
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="界面研究室首頁"><span class="brand-mark" aria-hidden="true">i<span>·</span></span><span>界面研究室<small>INTERFACE NOTES</small></span></a>
+    <nav aria-label="主選單"><a href="#papers">論文筆記</a><a href="#concepts">概念索引</a><a href="#connections">交叉閱讀</a></nav>
+    <a class="header-link" href="poisson-interface.html">入門簡報 <span>↗</span></a>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy"><div class="eyebrow"><span class="live-dot"></span> A LITTLE WIKI FOR BIG QUESTIONS</div>
+        <h1 id="hero-title">把論文，讀成一張<br><span class="underlined">彼此連結</span>的知識地圖。</h1>
+        <p class="hero-description">從 Immersed Interface Method 出發，<br>把公式、方法和問題，一頁一頁整理清楚。</p>
+        <div class="hero-actions"><a class="button dark" href="#papers">翻開研究筆記 <span>↓</span></a><a class="text-link" href="#connections">看看方法之間的關係 <span>↗</span></a></div>
+        <div class="hero-metadata"><span>06 篇論文</span><span>07 個概念</span><span>持續累積中 <span aria-hidden="true">✳</span></span></div>
+      </div>
+      <div class="hero-art" aria-label="一張關於介面跳躍條件的研究便箋">
+        <span class="orbit orbit-one"></span><span class="orbit orbit-two"></span>
+        <div class="memo-back"></div><div class="memo">
+          <span class="tape"></span><div class="memo-top"><span>CONCEPT NOTE / 001</span><span class="tiny-star">✳</span></div>
+          <h2>兩側不同，<br>依然可以連在一起。</h2>
+          <div class="memo-equation"><math display="block"><mrow><mo>[</mo><mi>u</mi><mo>]</mo><mo>=</mo><mi>w</mi><mspace width="1.2em"></mspace><mo>[</mo><mi>β</mi><msub><mi>u</mi><mi>n</mi></msub><mo>]</mo><mo>=</mo><mi>v</mi></mrow></math></div>
+          <svg class="memo-diagram" viewBox="0 0 300 112" role="img" aria-label="介面兩側與法向的概念示意">
+            <defs><pattern id="dots" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r=".7" fill="#bbb"></circle></pattern><marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#222"></path></marker></defs>
+            <path d="M18 12H148Q117 57 148 100H18Z" fill="url(#dots)"></path><path d="M148 12Q117 57 148 100" fill="none" stroke="#222" stroke-width="2"></path><path d="M135 55H188" stroke="#222" marker-end="url(#arrow)"></path>
+            <text x="65" y="61">Ω⁻</text><text x="224" y="61">Ω⁺</text><text x="168" y="45" font-size="13">n</text><text x="142" y="104" font-size="12">Γ</text>
+          </svg>
+          <div class="memo-bottom"><span>Jump conditions</span><button data-note="wiki/concepts/jump-conditions">翻到這一頁 ↗</button></div>
+          <p class="diagram-credit">公式：LeVeque &amp; Li, 1994 · 示意圖 [AI]</p>
+        </div>
+        <div class="little-friend" aria-hidden="true"><svg viewBox="0 0 96 65"><path d="M16 48L19 13L37 25Q48 20 58 25L77 12L81 48Q50 67 16 48Z" fill="#f8f8f5" stroke="#222" stroke-width="1.7"></path><path d="M31 37v5m33-5v5M43 44q6 7 12 0" stroke="#222" stroke-width="2" fill="none" stroke-linecap="round"></path></svg><span>慢慢讀，也很好。</span></div>
+      </div>
+    </section>
+
+    <div class="section-divider"><span>FIELD NOTES</span><span>從原文出發，讓理解留下來。</span><span>2026 — ONGOING</span></div>
+
+    <section class="papers-section" id="papers" aria-labelledby="papers-title">
+      <div class="section-heading"><div><span class="section-kicker">01 / READING SHELF</span><h2 id="papers-title">桌上的六篇論文<span class="handwritten">read &amp; connect</span></h2></div><p>讀懂一篇，再把它接到下一篇。</p></div>
+      <div class="shelf-toolbar"><div class="filters" role="group" aria-label="篩選研究方法"><button class="active" data-filter="all" aria-pressed="true">全部 <span>6</span></button><button data-filter="difference" aria-pressed="false">差分方法</button><button data-filter="coupled" aria-pressed="false">IB × IIM</button><button data-filter="neural" aria-pressed="false">Neural methods</button></div><label class="search"><span aria-hidden="true">⌕</span><input id="paper-search" type="search" placeholder="找找關鍵字…" aria-label="搜尋論文"></label></div>
+      <div class="paper-list" id="paper-list">
+        <article class="paper-row" data-category="difference" data-search="LeVeque Li 1994 IIM elliptic jump stencil 基礎 差分"><span class="paper-number">01</span><div class="paper-body"><div class="paper-meta">LEVEQUE &amp; LI <span>1994</span><span class="tag">IIM 基礎</span></div><button class="paper-title" data-note="wiki/papers/iim1994">介面不連續，差分還能保持二階嗎？</button><p>從 jump relations 到六點 stencil，理解 Immersed Interface Method 的起點。</p><span class="original-title">The Immersed Interface Method for Elliptic Equations…</span></div><button class="open-paper" data-note="wiki/papers/iim1994" aria-label="閱讀 LeVeque &amp; Li 1994 筆記">↗</button></article>
+        <article class="paper-row" data-category="difference" data-search="Gibou Fedkiw 2005 ghost Stefan level set 高階 差分"><span class="paper-number">02</span><div class="paper-body"><div class="paper-meta">GIBOU &amp; FEDKIW <span>2005</span><span class="tag">Ghost extension</span></div><button class="paper-title" data-note="wiki/papers/gibou2005">在不規則的邊界，延伸出高階精度。</button><p>Ghost values、四階差分，以及 Stefan problem 中速度與幾何的限制。</p><span class="original-title">A Fourth Order Accurate Discretization for the Laplace and Heat Equations…</span></div><button class="open-paper" data-note="wiki/papers/gibou2005" aria-label="閱讀 Gibou &amp; Fedkiw 2005 筆記">↗</button></article>
+        <article class="paper-row" data-category="coupled" data-search="Hu Lai Young 2015 HLY15 augmented Maxwell electric 電流體 IB IIM"><span class="paper-number">03</span><div class="paper-body"><div class="paper-meta">HU, LAI &amp; YOUNG <span>2015</span><span class="tag">IB × IIM</span></div><button class="paper-title" data-note="wiki/papers/HLY15">把電場的力，交給流體。</button><p>用 augmented IIM 解電勢，再透過 Maxwell traction 與 IB 耦合。</p><span class="original-title">A Hybrid Immersed Boundary and Immersed Interface Method…</span></div><button class="open-paper" data-note="wiki/papers/HLY15" aria-label="閱讀 HLY15 筆記">↗</button></article>
+        <article class="paper-row" data-category="coupled" data-search="Hu Lai Misbah HLM18 2018 surfactant moving bulk surface 界面活性劑 守恆"><span class="paper-number">04</span><div class="paper-body"><div class="paper-meta">HU, LAI &amp; MISBAH <span>2018</span><span class="tag">Surface–bulk</span></div><button class="paper-title" data-note="wiki/papers/HLM18">當介面移動，濃度也跟著改變。</button><p>追蹤 surface–bulk exchange，分清耦合精度與質量守恆。</p><span class="original-title">A Coupled Immersed Boundary and Immersed Interface Method…</span></div><button class="open-paper" data-note="wiki/papers/HLM18" aria-label="閱讀 HLM18 筆記">↗</button></article>
+        <article class="paper-row" data-category="neural" data-search="Hu Lin Lai DCSNN 2022 2106 neural shallow label discontinuous 神經網路"><span class="paper-number">05</span><div class="paper-body"><div class="paper-meta">HU, LIN &amp; LAI <span>2022 · v3</span><span class="tag">DCSNN</span></div><button class="paper-title" data-note="wiki/papers/2106.05587v3">多一個標籤，表示兩側的解。</button><p>以 subdomain label 增維，用 shallow network 捕捉解值的跳躍。</p><span class="original-title">A Discontinuity Capturing Shallow Neural Network…</span></div><button class="open-paper" data-note="wiki/papers/2106.05587v3" aria-label="閱讀 DCSNN 筆記">↗</button></article>
+        <article class="paper-row" data-category="neural" data-search="Tseng Lin Hu Lai 2023 cusp capturing PINN level set 2210 神經網路 導數"><span class="paper-number">06</span><div class="paper-body"><div class="paper-meta">TSENG ET AL. <span>2023 · v2</span><span class="tag">Cusp PINN</span></div><button class="paper-title" data-note="wiki/papers/2210.08424v2">讓光滑的網路，也能表示 cusp。</button><p>加入 |level set| feature；解值跳躍時，再搭配額外的 lifting。</p><span class="original-title">A Cusp-Capturing PINN for Elliptic Interface Problems</span></div><button class="open-paper" data-note="wiki/papers/2210.08424v2" aria-label="閱讀 Cusp PINN 筆記">↗</button></article>
+      </div><p id="empty-search" class="empty-search" hidden="">這裡還沒有這個關鍵字的筆記。試試 IIM、jump 或 neural？</p><p class="shelf-footnote"><span>✓ 六篇全文已讀</span> 筆記保留原文引用、公式編號與適用條件。</p>
+    </section>
+
+    <section class="concepts-section" id="concepts" aria-labelledby="concepts-title"><div><span class="section-kicker">02 / SMALL IDEAS, LINKED</span><h2 id="concepts-title">一個概念，連起幾篇論文。</h2><p>不用每次重頭找。把反覆遇見的問題，留成一頁。</p></div><div class="concept-cloud"><button data-note="wiki/concepts/jump-conditions">Jump conditions <span>↗</span></button><button data-note="wiki/concepts/immersed-interface-method">Immersed Interface Method <span>↗</span></button><button data-note="wiki/concepts/augmented-iim">Augmented IIM <span>↗</span></button><button data-note="wiki/concepts/ghost-extension">Ghost extension <span>↗</span></button><button data-note="wiki/concepts/surface-bulk-coupling">Surface–bulk coupling <span>↗</span></button><button data-note="wiki/concepts/neural-interface-representations">Neural representations <span>↗</span></button><button data-note="wiki/concepts/error-and-validation">誤差與驗證 <span>↗</span></button></div></section>
+
+    <section class="connections-section" id="connections" aria-labelledby="connections-title"><div class="section-heading"><div><span class="section-kicker">03 / BETWEEN THE PAPERS</span><h2 id="connections-title">有些理解，長在論文之間。</h2></div><span class="drawn-star" aria-hidden="true">✳</span></div><div class="connection-grid">
+      <button class="connection-card" data-note="wiki/synthesis/reading-map"><span class="card-label">READING MAP <span>01</span></span><span class="card-art" aria-hidden="true">○ ― ○<br>　╲　 │<br>　　○</span><h3>從哪裡開始讀？</h3><p>先理解跳躍條件，再往高階方法、物理耦合和 neural methods 前進。</p><span class="card-bottom">打開閱讀地圖 <span>↗</span></span></button>
+      <button class="connection-card" data-note="wiki/synthesis/method-comparison"><span class="card-label">SIDE BY SIDE <span>02</span></span><span class="card-art comparison-art" aria-hidden="true">u⁻ <span>│</span> u⁺</span><h3>看起來相似，差在哪裡？</h3><p>對齊問題設定、表示法與誤差定義，讓比較有共同的起點。</p><span class="card-bottom">翻開六篇方法比較 <span>↗</span></span></button>
+      <button class="connection-card" data-note="wiki/synthesis/research-questions"><span class="card-label">OPEN QUESTIONS <span>03</span></span><span class="card-art question-art" aria-hidden="true">？</span><h3>接下來，值得問什麼？</h3><p>區分作者的限制、跨篇待答問題，以及標記 [AI] 的推測性假說。</p><span class="card-bottom">看看研究問題 <span>↗</span></span></button>
+    </div></section>
+
+    <section class="lecture-link"><span class="lecture-badge">看懂介面<br>NO. 01</span><div><span class="section-kicker">A COMPANION TO THE WIKI</span><h2>Poisson interface problem</h2><p>從方程到 IIM，一步一步理解介面問題。</p></div><a class="button dark" href="poisson-interface.html">翻開新版 <span>↗</span></a></section>
+  </main>
+  <footer class="site-footer"><span>界面研究室 <span aria-hidden="true">✳</span> Interface Notes</span><p>以論文為依據，讓每一次閱讀留下連結。</p><button data-note="wiki/sources">來源清單 ↗</button></footer>
+</div>
+<dialog id="note-dialog" aria-labelledby="reader-title"><div class="reader-toolbar"><button id="reader-back" aria-label="回到上一份筆記" disabled="">←</button><span id="reader-kind">RESEARCH NOTE</span><button id="reader-close" aria-label="關閉筆記">關閉 <span>×</span></button></div><div class="reader-layout"><aside class="reader-aside"><span class="section-kicker">IN THIS NOTE</span><nav id="reader-toc" aria-label="筆記章節"></nav><p>每一個主張，<br>都可以回到原文。</p></aside><article class="reader-article" id="reader-content"><h1 id="reader-title">研究筆記</h1></article></div></dialog>
+
+</body></html>
